@@ -37,7 +37,7 @@ function processGuestData(csvContent) {
     
     rawGuests.forEach(guest => {
         const tableId = parseInt(guest.table_id);
-        const tableName = guest.table_name;
+        const tableName = guest.table_name || 'Table $ {tableId}';
         
         if (!tablesMap[tableId]) {
             tablesMap[tableId] = {
@@ -56,7 +56,8 @@ function processGuestData(csvContent) {
             name: guest.name,
             table: tableId,
             seat: guest.seat ? parseInt(guest.seat) : null,
-            vietnamese_name: guest.vietnamese_name || null
+            vietnamese_name: guest.vietnamese_name || null,
+            side: guest.side || 'bride' // Default to bride if not specified
         });
     });
     
