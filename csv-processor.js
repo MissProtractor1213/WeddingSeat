@@ -77,18 +77,18 @@ function processGuestData(csvContent) {
                 type: 'rectangle',
                 name: 'stage',
                 x: 500,
-                y: 50,
-                width: 600,
-                height: 80,
+                y: 80,
+                width: 500,
+                height: 70,
                 label: 'Stage'
             },
             // Bride and groom area
             {
                 type: 'rectangle',
                 name: 'brideGroom',
-                x: 350,
-                y: 150,
-                width: 150,
+                x: 500,
+                y: 180,
+                width: 200,
                 height: 60,
                 label: 'Bride and Groom'
             },
@@ -106,20 +106,20 @@ function processGuestData(csvContent) {
             {
                 type: 'rectangle',
                 name: 'bar',
-                x: 900,
-                y: 400,
-                width: 60,
-                height: 200,
+                x: 150,
+                y: 180,
+                width: 100,
+                height: 60,
                 label: 'BAR'
             },
             // VIP table
             {
                 type: 'rectangle',
                 name: 'vipTable',
-                x: 200,
-                y: 400,
-                width: 120,
-                height: 80,
+                x: 500,
+                y: 560,
+                width: 150,
+                height: 60,
                 label: 'VIP Table'
             },
             // Dance floor in center
@@ -127,9 +127,9 @@ function processGuestData(csvContent) {
                 type: 'rectangle',
                 name: 'danceFloor',
                 x: 500,
-                y: 400,
+                y: 340,
                 width: 200,
-                height: 180,
+                height: 150,
                 label: 'Dance Floor'
             }
         ],
@@ -146,7 +146,8 @@ function processGuestData(csvContent) {
                 table: guest.table,
                 tableObject: table,
                 seat: guest.seat,
-                vietnamese_name: guest.vietnamese_name
+                vietnamese_name: guest.vietnamese_name,
+                side: guest.side
             });
         });
     });
