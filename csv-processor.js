@@ -52,7 +52,6 @@ function processGuestData(csvContent) {
         }
         
         // Add this guest to the table's guest list
-        // Inside the function where you process each guest
         tablesMap[tableId].guests.push({
             name: guest.name,
             table: tableId,
@@ -60,16 +59,8 @@ function processGuestData(csvContent) {
             vietnamese_name: guest.vietnamese_name || null,
             side: guest.side || 'bride' // Default to bride's side if not specified
         });
-
-        // And later when creating the final guest list
-        guestList.push({
-            name: guest.name,
-            table: guest.table,
-            tableObject: table,
-            seat: guest.seat,
-            vietnamese_name: guest.vietnamese_name,
-            side: guest.side || 'bride'
-        });
+    });
+    
     // Extract the tables as an array
     const tables = Object.values(tablesMap);
     
@@ -177,7 +168,7 @@ function processGuestData(csvContent) {
     };
 }
 
-// Function to arrange tables in a custom layout based on the Table Seating Chart document
+// Function to arrange tables in a custom layout based on the document
 function arrangeTablesInCustomLayout(tables) {
     // Define table positions according to the document
     const tablePositions = {
@@ -258,106 +249,6 @@ function arrangeTablesInCustomLayout(tables) {
         }
     });
 }
-    
-    // Create the guest list
-    const guestList = [];
-    
-    tables.forEach(table => {
-        table.guests.forEach(guest => {
-            guestList.push({
-                name: guest.name,
-                table: guest.table,
-                tableObject: table,
-                seat: guest.seat,
-                vietnamese_name: guest.vietnamese_name,
-                side: guest.side
-            });
-        });
-    });
-    
-    return {
-        venueLayout: venueLayout,
-        guestList: guestList
-    };
-}
-
-// Function to arrange tables in a custom layout based on the document
-function arrangeTablesInCustomLayout(tables) {
-    const numTables = tables.length;
-    
-    // Define table positions based on the floor plan in the document
-    // This mimics the layout of 45 round tables from page 4
-    
-    // Cluster 1: Top left tables (6 tables in 2 rows of 3)
-    for (let i = 0; i < 6 && i < numTables; i++) {
-        const col = i % 3;
-        const row = Math.floor(i / 3);
-        tables[i].x = 150 + col * 120;
-        tables[i].y = 220 + row * 120;
-    }
-    
-    // Cluster 2: Top right tables (6 tables in 2 rows of 3)
-    for (let i = 6; i < 12 && i < numTables; i++) {
-        const col = (i - 6) % 3;
-        const row = Math.floor((i - 6) / 3);
-        tables[i].x = 650 + col * 120;
-        tables[i].y = 220 + row * 120;
-    }
-    
-    // Cluster 3: Left side of dance floor (4 tables)
-    for (let i = 12; i < 16 && i < numTables; i++) {
-        tables[i].x = 300;
-        tables[i].y = 320 + (i - 12) * 100;
-    }
-    
-    // Cluster 4: Right side of dance floor (4 tables)
-    for (let i = 16; i < 20 && i < numTables; i++) {
-        tables[i].x = 700;
-        tables[i].y = 320 + (i - 16) * 100;
-    }
-    
-    // Cluster 5: Bottom left (6 tables in 2 rows of 3)
-    for (let i = 20; i < 26 && i < numTables; i++) {
-        const col = (i - 20) % 3;
-        const row = Math.floor((i - 20) / 3);
-        tables[i].x = 150 + col * 120;
-        tables[i].y = 580 + row * 120;
-    }
-    
-    // Cluster 6: Bottom center (4 tables in 2 rows of 2)
-    for (let i = 26; i < 30 && i < numTables; i++) {
-        const col = (i - 26) % 2;
-        const row = Math.floor((i - 26) / 2);
-        tables[i].x = 450 + col * 100;
-        tables[i].y = 580 + row * 120;
-    }
-    
-    // Cluster 7: Bottom right (6 tables in 2 rows of 3)
-    for (let i = 30; i < 36 && i < numTables; i++) {
-        const col = (i - 30) % 3;
-        const row = Math.floor((i - 30) / 3);
-        tables[i].x = 650 + col * 120;
-        tables[i].y = 580 + row * 120;
-    }
-    
-    // Cluster 8: Far left (3 tables in 1 column)
-    for (let i = 36; i < 39 && i < numTables; i++) {
-        tables[i].x = 80;
-        tables[i].y = 320 + (i - 36) * 120;
-    }
-    
-    // Cluster 9: Far right (3 tables in 1 column)
-    for (let i = 39; i < 42 && i < numTables; i++) {
-        tables[i].x = 820;
-        tables[i].y = 320 + (i - 39) * 120;
-    }
-    
-    // Remaining tables (if any) placed at the bottom
-    for (let i = 42; i < numTables; i++) {
-        tables[i].x = 300 + ((i - 42) % 5) * 100;
-        tables[i].y = 720;
-    }
-}
 
 // This function loads the CSV file and initializes the data
 async function initializeFromCSV() {
@@ -387,12 +278,9 @@ async function initializeFromCSV() {
 
 // A simplified UI initialization function (replace with your actual initialization)
 function initializeUI() {
-    // Initialize the venue map
-    initializeVenueMap();
-    
     // Other initialization as needed
     console.log('UI initialized successfully.');
 }
 
-// This would get called by your main script
-// initializeFromCSV();
+// Call this function when the document is loaded
+// (This will be called from script.js)
