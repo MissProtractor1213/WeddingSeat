@@ -90,9 +90,17 @@
         <p data-lang-key="assistance-message">IF YOU NEED ASSISTANCE, PLEASE ASK ONE OF OUR USHERS OR WEDDING PARTY MEMBERS.</p>
     </footer>
 
-    <div id="errorMessage" class="error-message hidden">
-        Error loading guest data. Please try refreshing the page.
-    </div>
+    <!-- Replace the error message div with this improved version -->
+<div id="errorMessage" class="error-message hidden">
+    Error loading guest data. Please try refreshing the page.
+    <button id="retryButton" class="retry-button">Retry</button>
+</div>
+
+<!-- Replace the script tags at the bottom of the file with these -->
+<script src="translations.js"></script>
+<script src="csv-processor.js"></script>
+<script src="script.js"></script>
+<script src="initialization.js"></script>
     
     <script src="translations.js"></script>
     <script src="csv-processor.js"></script>
