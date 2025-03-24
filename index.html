@@ -32,11 +32,26 @@
                 
                 <div class="search-container">
                     <input type="text" id="nameSearch" data-lang-key="search-placeholder" placeholder="ENTER YOUR FULL NAME">
+                    
+                    <div class="side-selector">
+                        <p data-lang-key="side-prompt">I am a guest of:</p>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="side" value="bride" checked>
+                                <span data-lang-key="bride-side">The Bride</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="side" value="groom">
+                                <span data-lang-key="groom-side">The Groom</span>
+                            </label>
+                        </div>
+                    </div>
+                    
                     <button id="searchButton" data-lang-key="search-button">FIND MY TABLE</button>
                 </div>
             </div>
         </div>
-        
+                    
         <div id="resultContainer" class="result-container hidden">
             <div class="result-card">
                 <h3 id="guestName">Guest Name</h3>
