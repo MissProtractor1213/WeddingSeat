@@ -238,6 +238,34 @@ button:hover {
     max-width: 700px;
 }
 
+.retry-button {
+    background-color: #c896e0;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+    font-family: 'Lato', sans-serif;
+    letter-spacing: 1px;
+    display: block;
+    margin: 10px auto;
+}
+
+.retry-button:hover {
+    background-color: #b57ad1;
+}
+
+/* Make the error message more visible */
+.error-message {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #ffeeee;
+    border: 2px solid #ffcaca;
+}
+
 .result-card {
     background-color: white;
     padding: 40px;
