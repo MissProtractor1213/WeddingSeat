@@ -495,6 +495,40 @@ async function initializeFromCSV() {
     document.getElementById('errorMessage').classList.remove('hidden');
   }
 }
+    // Add this function to your script.js
+function validateCSV(csvContent) {
+  // Check if CSV content exists
+  if (!csvContent || csvContent.trim() === '') {
+    console.error("CSV content is empty");
+    return false;
+  }
+  
+  // Split into lines
+  const lines = csvContent.split(/\r\n|\n/);
+  
+  // Check if we have header and at least one row
+  if (lines.length < 2) {
+    console.error("CSV has insufficient lines");
+    return false;
+  }
+  
+  // Get the header and check for expected columns
+  const header = lines[0].split(',');
+  const requiredColumns = ['name', 'table_id', 'table_name', 'side'];
+  const missingColumns = requiredColumns.filter(col => !header.includes(col));
+  
+  if (missingColumns.length > 0) {
+    console.error("CSV is missing required columns:", missingColumns);
+    return false;
+  }
+  
+  console.log("CSV format appears valid");
+  return true;
+}
+
+// Use this in your initializeFromCSV function after fetching the CSV
+// Add after const csvContent = await response.text();
+validateCSV(csvContent);
     
     // Apply translations initially
     applyTranslations();
