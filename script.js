@@ -112,6 +112,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Make the applyTranslations function globally available
+    window.applyTranslations = applyTranslations;
+    
     function searchGuest() {
         console.log("Search function called");
         // Get the search input and normalize it
@@ -349,10 +352,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    function initializeVenueMap() {
+    // Define the initializeVenueMap function in the global scope
+    window.initializeVenueMap = function() {
         // Ensure venue layout exists
         if (!window.venueLayout) {
             console.error('Venue layout is not initialized');
+            return;
+        }
+        
+        // Get the venueMapElement
+        const venueMapElement = document.getElementById('venueMap');
+        if (!venueMapElement) {
+            console.error('Venue map element not found');
             return;
         }
         
@@ -417,7 +428,9 @@ document.addEventListener('DOMContentLoaded', function() {
             tableDiv.textContent = `${table.id}: ${table.name}`;
             venueMapElement.appendChild(tableDiv);
         });
-    }
+        
+        console.log('Venue map initialized with', window.venueLayout.tables.length, 'tables');
+    };
     
     function highlightTable(tableId) {
         // Remove highlight from all tables
@@ -464,9 +477,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("CSV format appears valid");
         return true;
     }
-    
-    // Initialize the application by loading the CSV data
-    initializeFromCSV();
     
     // Apply translations initially
     applyTranslations();
