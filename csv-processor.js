@@ -52,6 +52,7 @@ function processGuestData(csvContent) {
         }
         
         // Add this guest to the table's guest list
+        // Inside the function where you process each guest
         tablesMap[tableId].guests.push({
             name: guest.name,
             table: tableId,
@@ -59,8 +60,16 @@ function processGuestData(csvContent) {
             vietnamese_name: guest.vietnamese_name || null,
             side: guest.side || 'bride' // Default to bride's side if not specified
         });
-    });
-    
+
+        // And later when creating the final guest list
+        guestList.push({
+            name: guest.name,
+            table: guest.table,
+            tableObject: table,
+            seat: guest.seat,
+            vietnamese_name: guest.vietnamese_name,
+            side: guest.side || 'bride'
+        });
     // Extract the tables as an array
     const tables = Object.values(tablesMap);
     
