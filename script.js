@@ -442,7 +442,59 @@ document.getElementById('searchButton').addEventListener('click', function() {
     }
     
     // Initialize the data from CSV, then set up the UI
-    initializeFromCSV();
+    // Replace your existing initializeFromCSV function with this
+async function initializeFromCSV() {
+  console.log("Starting to initialize from CSV...");
+  
+  try {
+    // Fetch the CSV file
+    console.log("Fetching guests.csv...");
+    const response = await fetch('guests.csv');
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`);
+    }
+    
+    const csvContent = await response.text();
+    console.log("CSV fetched successfully. First 100 characters:", csvContent.substring(0, 100));
+    
+    // Process the CSV data
+    console.log("Processing CSV data...");
+    const data = processGuestData(csvContent);
+    
+    console.log("Data processed:", {
+      venueLayoutTables: data.venueLayout.tables.length,
+      guestListLength: data.guestList.length
+    });
+    
+    // Store the generated data in global variables
+    window.venueLayout = data.venueLayout;
+    window.guestList = data.guestList;
+    
+    // Log guests for debugging
+    console.log("First 3 guests:", window.guestList.slice(0, 3));
+    
+    // Test search functionality with a known guest
+    const testGuest = window.guestList[0]; // First guest in the list
+    if (testGuest) {
+      console.log("Test guest for search:", testGuest.name);
+      // Try searching for this guest
+      const searchResult = findGuest(testGuest.name.toLowerCase(), testGuest.side);
+      console.log("Search test result:", searchResult ? "Found" : "Not found");
+    }
+    
+    // Log success message
+    console.log(`Successfully loaded ${data.guestList.length} guests at ${data.venueLayout.tables.length} tables.`);
+    
+    // Initialize the UI now that we have the data
+    initializeUI();
+    applyTranslations();
+  } catch (error) {
+    console.error('Error loading guest data:', error);
+    document.getElementById('errorMessage').textContent = 'Failed to load guest data: ' + error.message;
+    document.getElementById('errorMessage').classList.remove('hidden');
+  }
+}
     
     // Apply translations initially
     applyTranslations();
