@@ -26,10 +26,22 @@ document.addEventListener('DOMContentLoaded', function() {
     updateLanguageButtonState();
     
     // Initialize from CSV
-    initializeFromCSV().then(() => {
-        // Apply translations after data is loaded
-        applyTranslations();
-    });
+async function initializeFromCSV() {
+    try {
+        // Fetch the CSV file
+        const response = await fetch('guests.csv');
+        const csvContent = await response.text();
+        
+        console.log("CSV loaded successfully. First 100 characters:", csvContent.substring(0, 100));
+        
+        // Process the CSV data
+        const data = processGuestData(csvContent);
+        // ...
+    } catch (error) {
+        console.error('Error loading guest data:', error);
+        // ...
+    }
+}
     
     // Add event listeners
     searchButton.addEventListener('click', searchGuest);
