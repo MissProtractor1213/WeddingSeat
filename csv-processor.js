@@ -325,15 +325,46 @@ function validateCSV(csvContent) {
     return true;
 }
 
-// A function to initialize the UI elements after data is loaded
+// Initialize UI elements after data is loaded
 function initializeUI() {
     console.log('Initializing UI...');
     
-    // Initialize the venue map
-    if (window.venueLayout) {
-        // Check if the initializeVenueMap function is available
-        if (typeof initializeVenueMap === 'function') {
+    // Initialize the venue map if the function exists in global scope
+    if (window.venueLayout && typeof window.initializeVenueMap === 'function') {
+        window.initializeVenueMap();
+        console.log('Venue map initialized');
+    } else {
+        // Fallback to local initializeVenueMap function if it exists
+        if (window.venueLayout && typeof initializeVenueMap === 'function') {
             initializeVenueMap();
-            console.log('Venue map initialized');
+            console.log('Venue map initialized (local function)');
         } else {
-            console.error('initializeV
+            console.error('initializeVenueMap function not found or venue layout not available');
+        }
+    }
+    
+    // Apply translations if the function exists
+    if (typeof applyTranslations === 'function') {
+        applyTranslations();
+        console.log('Translations applied');
+    } else {
+        console.warn('applyTranslations function not found');
+    }
+    
+    // Check if all elements are properly loaded
+    const guestListLoaded = window.guestList && Array.isArray(window.guestList) && window.guestList.length > 0;
+    console.log(`Guest list loaded: ${guestListLoaded ? 'YES' : 'NO'}`);
+    
+    const venueLayoutLoaded = window.venueLayout && Array.isArray(window.venueLayout.tables);
+    console.log(`Venue layout loaded: ${venueLayoutLoaded ? 'YES' : 'NO'}`);
+    
+    // Enable UI elements now that data is loaded
+    const searchButton = document.getElementById('searchButton');
+    if (searchButton) {
+        searchButton.disabled = false;
+        console.log('Search button enabled');
+    }
+}
+
+// Make initializeFromCSV available globally
+window.initializeFromCSV = initializeFromCSV;
