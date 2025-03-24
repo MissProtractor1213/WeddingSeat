@@ -21,23 +21,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (localStorage.getItem('weddinglanguage')) {
         currentLanguage = localStorage.getItem('weddinglanguage');
     }
-    // Add this logging code to check if data is loading
-console.log("DOM fully loaded");
-
-// Add an event listener to check when the search button is clicked
-document.getElementById('searchButton').addEventListener('click', function() {
-  console.log("Search button clicked");
-  console.log("Search input value:", document.getElementById('nameSearch').value);
-  console.log("Selected side:", document.querySelector('input[name="side"]:checked').value);
-  console.log("Guest list loaded:", window.guestList ? window.guestList.length + " guests" : "No guest list found");
-  
-  if (window.guestList && window.guestList.length > 0) {
-    console.log("First few guests:", window.guestList.slice(0, 3));
-  }
-});
     
-    // Set initial active language button
-    updateLanguageButtonState();
+    // Add this logging code to check if data is loading
+    console.log("DOM fully loaded");
     
     // Add event listeners
     searchButton.addEventListener('click', searchGuest);
@@ -94,6 +80,9 @@ document.getElementById('searchButton').addEventListener('click', function() {
         }
     }
     
+    // Set initial active language button
+    updateLanguageButtonState();
+    
     // Function to apply translations to all elements
     function applyTranslations() {
         // Get all elements with the data-lang-key attribute
@@ -124,6 +113,7 @@ document.getElementById('searchButton').addEventListener('click', function() {
     }
     
     function searchGuest() {
+        console.log("Search function called");
         // Get the search input and normalize it
         const searchName = nameSearchInput.value.trim().toLowerCase();
         
@@ -139,10 +129,14 @@ document.getElementById('searchButton').addEventListener('click', function() {
             return;
         }
         
+        console.log(`Searching for "${searchName}" on "${selectedSide}" side`);
+        console.log("Guest list status:", window.guestList ? `${window.guestList.length} guests loaded` : "No guest list loaded");
+        
         // Find the guest in our data, taking the side into account
         const guest = findGuest(searchName, selectedSide);
         
         if (guest) {
+            console.log("Guest found:", guest);
             // Display guest information
             displayGuestInfo(guest);
             
@@ -180,6 +174,7 @@ document.getElementById('searchButton').addEventListener('click', function() {
                 }
             }
         } else {
+            console.log("Guest not found");
             // Show no result message
             noResultContainer.classList.remove('hidden');
         }
@@ -260,7 +255,7 @@ document.getElementById('searchButton').addEventListener('click', function() {
             }
         });
         
-        // Only return a match if the similarity is above a threshold (0.6 or 60% similar)
+        // Only return a match if the similarity is above a threshold (0.4 or 40% similar)
         return bestScore > 0.4 ? bestMatch : null;
     }
     
@@ -309,7 +304,6 @@ document.getElementById('searchButton').addEventListener('click', function() {
         return 1.0 - (distance / longer.length);
     }
     
-    // The missing displayGuestInfo function 
     function displayGuestInfo(guest) {
         // Set guest name and table information
         guestNameElement.textContent = guest.name;
@@ -441,94 +435,38 @@ document.getElementById('searchButton').addEventListener('click', function() {
         }
     }
     
-    // Initialize the data from CSV, then set up the UI
-    // Replace your existing initializeFromCSV function with this
-async function initializeFromCSV() {
-  console.log("Starting to initialize from CSV...");
-  
-  try {
-    // Fetch the CSV file
-    console.log("Fetching guests.csv...");
-    const response = await fetch('guests.csv');
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`);
+    function validateCSV(csvContent) {
+        // Check if CSV content exists
+        if (!csvContent || csvContent.trim() === '') {
+            console.error("CSV content is empty");
+            return false;
+        }
+        
+        // Split into lines
+        const lines = csvContent.split(/\r\n|\n/);
+        
+        // Check if we have header and at least one row
+        if (lines.length < 2) {
+            console.error("CSV has insufficient lines");
+            return false;
+        }
+        
+        // Get the header and check for expected columns
+        const header = lines[0].split(',');
+        const requiredColumns = ['name', 'table_id', 'table_name', 'side'];
+        const missingColumns = requiredColumns.filter(col => !header.includes(col));
+        
+        if (missingColumns.length > 0) {
+            console.error("CSV is missing required columns:", missingColumns);
+            return false;
+        }
+        
+        console.log("CSV format appears valid");
+        return true;
     }
     
-    const csvContent = await response.text();
-    console.log("CSV fetched successfully. First 100 characters:", csvContent.substring(0, 100));
-    
-    // Process the CSV data
-    console.log("Processing CSV data...");
-    const data = processGuestData(csvContent);
-    
-    console.log("Data processed:", {
-      venueLayoutTables: data.venueLayout.tables.length,
-      guestListLength: data.guestList.length
-    });
-    
-    // Store the generated data in global variables
-    window.venueLayout = data.venueLayout;
-    window.guestList = data.guestList;
-    
-    // Log guests for debugging
-    console.log("First 3 guests:", window.guestList.slice(0, 3));
-    
-    // Test search functionality with a known guest
-    const testGuest = window.guestList[0]; // First guest in the list
-    if (testGuest) {
-      console.log("Test guest for search:", testGuest.name);
-      // Try searching for this guest
-      const searchResult = findGuest(testGuest.name.toLowerCase(), testGuest.side);
-      console.log("Search test result:", searchResult ? "Found" : "Not found");
-    }
-    
-    // Log success message
-    console.log(`Successfully loaded ${data.guestList.length} guests at ${data.venueLayout.tables.length} tables.`);
-    
-    // Initialize the UI now that we have the data
-    initializeUI();
-    applyTranslations();
-  } catch (error) {
-    console.error('Error loading guest data:', error);
-    document.getElementById('errorMessage').textContent = 'Failed to load guest data: ' + error.message;
-    document.getElementById('errorMessage').classList.remove('hidden');
-  }
-}
-    // Add this function to your script.js
-function validateCSV(csvContent) {
-  // Check if CSV content exists
-  if (!csvContent || csvContent.trim() === '') {
-    console.error("CSV content is empty");
-    return false;
-  }
-  
-  // Split into lines
-  const lines = csvContent.split(/\r\n|\n/);
-  
-  // Check if we have header and at least one row
-  if (lines.length < 2) {
-    console.error("CSV has insufficient lines");
-    return false;
-  }
-  
-  // Get the header and check for expected columns
-  const header = lines[0].split(',');
-  const requiredColumns = ['name', 'table_id', 'table_name', 'side'];
-  const missingColumns = requiredColumns.filter(col => !header.includes(col));
-  
-  if (missingColumns.length > 0) {
-    console.error("CSV is missing required columns:", missingColumns);
-    return false;
-  }
-  
-  console.log("CSV format appears valid");
-  return true;
-}
-
-// Use this in your initializeFromCSV function after fetching the CSV
-// Add after const csvContent = await response.text();
-validateCSV(csvContent);
+    // Initialize the application by loading the CSV data
+    initializeFromCSV();
     
     // Apply translations initially
     applyTranslations();
