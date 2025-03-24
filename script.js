@@ -25,24 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set initial active language button
     updateLanguageButtonState();
     
-    // Initialize from CSV
-async function initializeFromCSV() {
-    try {
-        // Fetch the CSV file
-        const response = await fetch('guests.csv');
-        const csvContent = await response.text();
-        
-        console.log("CSV loaded successfully. First 100 characters:", csvContent.substring(0, 100));
-        
-        // Process the CSV data
-        const data = processGuestData(csvContent);
-        // ...
-    } catch (error) {
-        console.error('Error loading guest data:', error);
-        // ...
-    }
-}
-    
     // Add event listeners
     searchButton.addEventListener('click', searchGuest);
     nameSearchInput.addEventListener('keyup', function(event) {
@@ -98,9 +80,6 @@ async function initializeFromCSV() {
         }
     }
     
-    // Initialize the venue map
-    initializeVenueMap();
-    
     // Function to apply translations to all elements
     function applyTranslations() {
         // Get all elements with the data-lang-key attribute
@@ -131,51 +110,86 @@ async function initializeFromCSV() {
     }
     
     function searchGuest() {
-    // Get the search input and normalize it
-    const searchName = nameSearchInput.value.trim().toLowerCase();
-    
-    // Get the selected side
-    const selectedSide = document.querySelector('input[name="side"]:checked').value;
-    
-    // Hide previous results
-    resultContainer.classList.add('hidden');
-    noResultContainer.classList.add('hidden');
-    
-    // Don't search if input is empty
-    if (!searchName) {
-        return;
+        // Get the search input and normalize it
+        const searchName = nameSearchInput.value.trim().toLowerCase();
+        
+        // Get the selected side
+        const selectedSide = document.querySelector('input[name="side"]:checked').value;
+        
+        // Hide previous results
+        resultContainer.classList.add('hidden');
+        noResultContainer.classList.add('hidden');
+        
+        // Don't search if input is empty
+        if (!searchName) {
+            return;
+        }
+        
+        // Find the guest in our data, taking the side into account
+        const guest = findGuest(searchName, selectedSide);
+        
+        if (guest) {
+            // Display guest information
+            displayGuestInfo(guest);
+        } else {
+            // Show no result message
+            noResultContainer.classList.remove('hidden');
+        }
     }
-    
-    // Find the guest in our data, taking the side into account
-    const guest = findGuest(searchName, selectedSide);
-    
-    if (guest) {
-        // Display guest information
-        displayGuestInfo(guest);
-    } else {
-        // Show no result message
-        noResultContainer.classList.remove('hidden');
-    }
-}
 
-function findGuest(searchName, side) {
-    // Filter guests by the selected side first, then find a match by name
-    return guestList.find(guest => 
-        guest.side === side && (
-            guest.name.toLowerCase().includes(searchName) ||
-            searchName.includes(guest.name.toLowerCase()) ||
-            (guest.vietnamese_name && guest.vietnamese_name.toLowerCase().includes(searchName)) ||
-            (guest.vietnamese_name && searchName.includes(guest.vietnamese_name.toLowerCase()))
-        )
-    );
-}
+    function findGuest(searchName, side) {
+        // Make sure guestList exists
+        if (!window.guestList || !Array.isArray(window.guestList)) {
+            console.error('Guest list is not properly initialized');
+            return null;
+        }
+        
+        // Filter guests by the selected side first, then find a match by name
+        return window.guestList.find(guest => 
+            guest.side === side && (
+                guest.name.toLowerCase().includes(searchName) ||
+                searchName.includes(guest.name.toLowerCase()) ||
+                (guest.vietnamese_name && guest.vietnamese_name.toLowerCase().includes(searchName)) ||
+                (guest.vietnamese_name && searchName.includes(guest.vietnamese_name.toLowerCase()))
+            )
+        );
+    }
+    
+    // The missing displayGuestInfo function 
+    function displayGuestInfo(guest) {
+        // Set guest name and table information
+        guestNameElement.textContent = guest.name;
+        tableNameElement.textContent = guest.tableObject.name;
+        
+        // Set seat number if available
+        if (guest.seat) {
+            seatNumberElement.textContent = getSeatNumberText(guest.seat, currentLanguage);
+        } else {
+            seatNumberElement.textContent = '';
+        }
+        
+        // Display tablemates
+        displayTablemates(guest);
+        
+        // Highlight the guest's table on the map
+        highlightTable(guest.table);
+        
+        // Show the result container
+        resultContainer.classList.remove('hidden');
+    }
     
     function displayTablemates(guest) {
         // Clear previous tablemates
         tablematesListElement.innerHTML = '';
         
+        // Make sure guestList exists
+        if (!window.guestList || !Array.isArray(window.guestList)) {
+            console.error('Guest list is not properly initialized');
+            return;
+        }
+        
         // Find all guests at the same table
-        const tablemates = guestList.filter(g => 
+        const tablemates = window.guestList.filter(g => 
             g.table === guest.table && g.name !== guest.name
         );
         
@@ -188,6 +202,12 @@ function findGuest(searchName, side) {
     }
     
     function initializeVenueMap() {
+        // Ensure venue layout exists
+        if (!window.venueLayout) {
+            console.error('Venue layout is not initialized');
+            return;
+        }
+        
         // Clear any existing elements
         venueMapElement.innerHTML = '';
         
@@ -196,12 +216,12 @@ function findGuest(searchName, side) {
         const mapHeight = venueMapElement.offsetHeight;
         
         // Calculate scaling factors
-        const scaleX = mapWidth / venueLayout.width;
-        const scaleY = mapHeight / venueLayout.height;
+        const scaleX = mapWidth / window.venueLayout.width;
+        const scaleY = mapHeight / window.venueLayout.height;
         
         // Draw fixed elements (if any)
-        if (venueLayout.fixedElements) {
-            venueLayout.fixedElements.forEach(element => {
+        if (window.venueLayout.fixedElements) {
+            window.venueLayout.fixedElements.forEach(element => {
                 const elementDiv = document.createElement('div');
                 elementDiv.className = 'fixed-element';
                 elementDiv.style.left = `${element.x * scaleX - (element.width * scaleX / 2)}px`;
@@ -238,7 +258,7 @@ function findGuest(searchName, side) {
         }
         
         // Draw tables
-        venueLayout.tables.forEach(table => {
+        window.venueLayout.tables.forEach(table => {
             const tableDiv = document.createElement('div');
             tableDiv.className = 'table';
             tableDiv.id = `table-${table.id}`;
@@ -266,4 +286,10 @@ function findGuest(searchName, side) {
             tableElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }
+    
+    // Initialize the data from CSV, then set up the UI
+    initializeFromCSV();
+    
+    // Apply translations initially
+    applyTranslations();
 });
