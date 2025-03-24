@@ -9,6 +9,9 @@ const translations = {
         "find-table": "FIND YOUR TABLE",
         "search-placeholder": "ENTER YOUR FULL NAME",
         "search-button": "FIND MY TABLE",
+        "side-prompt": "I am a guest of:",
+        "bride-side": "The Bride",
+        "groom-side": "The Groom"
         "seated-at": "You are seated at:",
         "seat-number": "Your seat number is:",
         "seated-with": "You are seated with:",
@@ -34,6 +37,9 @@ const translations = {
         "find-table": "TÌM BÀN CỦA BẠN",
         "search-placeholder": "NHẬP TÊN ĐẦY ĐỦ CỦA BẠN",
         "search-button": "TÌM BÀN CỦA TÔI",
+        "side-prompt": "Tôi là khách mời của:",
+        "bride-side": "Cô Dâu",
+        "groom-side": "Chú Rể"
         "seated-at": "Bạn được xếp chỗ tại:",
         "seat-number": "Số ghế của bạn là:",
         "seated-with": "Bạn ngồi cùng với:",
