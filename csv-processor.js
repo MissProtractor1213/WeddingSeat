@@ -18,7 +18,7 @@ function parseCSV(csvContent) {
         const currentLine = lines[i].split(',');
         
         for (let j = 0; j < headers.length; j++) {
-            obj[headers[j]] = currentLine[j].trim();
+            obj[headers[j]] = currentLine[j] ? currentLine[j].trim() : '';
         }
         
         result.push(obj);
@@ -29,8 +29,11 @@ function parseCSV(csvContent) {
 
 // Function to process the CSV data and generate the venue layout and guest list
 function processGuestData(csvContent) {
+    console.log("Processing guest data...");
+    
     // Parse the CSV content
     const rawGuests = parseCSV(csvContent);
+    console.log(`Parsed ${rawGuests.length} guests from CSV`);
     
     // Extract unique tables
     const tablesMap = {};
@@ -253,9 +256,21 @@ function arrangeTablesInCustomLayout(tables) {
 // This function loads the CSV file and initializes the data
 async function initializeFromCSV() {
     try {
+        console.log("Initializing from CSV...");
+        
         // Fetch the CSV file
         const response = await fetch('guests.csv');
+        if (!response.ok) {
+            throw new Error(`Failed to fetch guests.csv: ${response.status} ${response.statusText}`);
+        }
+        
         const csvContent = await response.text();
+        console.log(`CSV loaded, length: ${csvContent.length} characters`);
+        
+        // Validate CSV format
+        if (!validateCSV(csvContent)) {
+            throw new Error("CSV validation failed");
+        }
         
         // Process the CSV data
         const data = processGuestData(csvContent);
@@ -264,23 +279,61 @@ async function initializeFromCSV() {
         window.venueLayout = data.venueLayout;
         window.guestList = data.guestList;
         
-        // Log success message
         console.log(`Successfully loaded ${data.guestList.length} guests at ${data.venueLayout.tables.length} tables.`);
         
         // Initialize the UI now that we have the data
         initializeUI();
+        
+        // Return success
+        return true;
     } catch (error) {
         console.error('Error loading guest data:', error);
-        document.getElementById('errorMessage').textContent = 'Failed to load guest data. Please try refreshing the page.';
+        document.getElementById('errorMessage').textContent = `Failed to load guest data: ${error.message}`;
         document.getElementById('errorMessage').classList.remove('hidden');
+        return false;
     }
 }
 
-// A simplified UI initialization function (replace with your actual initialization)
-function initializeUI() {
-    // Other initialization as needed
-    console.log('UI initialized successfully.');
+// Validate CSV format
+function validateCSV(csvContent) {
+    // Check if CSV content exists
+    if (!csvContent || csvContent.trim() === '') {
+        console.error("CSV content is empty");
+        return false;
+    }
+    
+    // Split into lines
+    const lines = csvContent.split(/\r\n|\n/);
+    
+    // Check if we have header and at least one row
+    if (lines.length < 2) {
+        console.error("CSV has insufficient lines");
+        return false;
+    }
+    
+    // Get the header and check for expected columns
+    const header = lines[0].split(',');
+    const requiredColumns = ['name', 'table_id', 'table_name', 'side'];
+    const missingColumns = requiredColumns.filter(col => !header.includes(col));
+    
+    if (missingColumns.length > 0) {
+        console.error("CSV is missing required columns:", missingColumns);
+        return false;
+    }
+    
+    console.log("CSV format appears valid");
+    return true;
 }
 
-// Call this function when the document is loaded
-// (This will be called from script.js)
+// A function to initialize the UI elements after data is loaded
+function initializeUI() {
+    console.log('Initializing UI...');
+    
+    // Initialize the venue map
+    if (window.venueLayout) {
+        // Check if the initializeVenueMap function is available
+        if (typeof initializeVenueMap === 'function') {
+            initializeVenueMap();
+            console.log('Venue map initialized');
+        } else {
+            console.error('initializeV
