@@ -119,66 +119,44 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function searchGuest() {
-        // Get the search input and normalize it
-        const searchName = nameSearchInput.value.trim().toLowerCase();
-        
-        // Hide previous results
-        resultContainer.classList.add('hidden');
-        noResultContainer.classList.add('hidden');
-        
-        // Don't search if input is empty
-        if (!searchName) {
-            return;
-        }
-        
-        // Find the guest in our data
-        const guest = findGuest(searchName);
-        
-        if (guest) {
-            // Display guest information
-            displayGuestInfo(guest);
-        } else {
-            // Show no result message
-            noResultContainer.classList.remove('hidden');
-        }
+    // Get the search input and normalize it
+    const searchName = nameSearchInput.value.trim().toLowerCase();
+    
+    // Get the selected side
+    const selectedSide = document.querySelector('input[name="side"]:checked').value;
+    
+    // Hide previous results
+    resultContainer.classList.add('hidden');
+    noResultContainer.classList.add('hidden');
+    
+    // Don't search if input is empty
+    if (!searchName) {
+        return;
     }
     
-    function findGuest(searchName) {
-        // Normalize the search input to handle partial matches and case insensitivity
-        return guestList.find(guest => 
+    // Find the guest in our data, taking the side into account
+    const guest = findGuest(searchName, selectedSide);
+    
+    if (guest) {
+        // Display guest information
+        displayGuestInfo(guest);
+    } else {
+        // Show no result message
+        noResultContainer.classList.remove('hidden');
+    }
+}
+
+function findGuest(searchName, side) {
+    // Filter guests by the selected side first, then find a match by name
+    return guestList.find(guest => 
+        guest.side === side && (
             guest.name.toLowerCase().includes(searchName) ||
             searchName.includes(guest.name.toLowerCase()) ||
             (guest.vietnamese_name && guest.vietnamese_name.toLowerCase().includes(searchName)) ||
             (guest.vietnamese_name && searchName.includes(guest.vietnamese_name.toLowerCase()))
-        );
-    }
-    
-    function displayGuestInfo(guest) {
-        // Set the guest's name and table
-        guestNameElement.textContent = guest.name;
-        
-        // Find the table info
-        const tableInfo = venueLayout.tables.find(table => table.id === guest.table);
-        
-        // Set table name
-        tableNameElement.textContent = `Table ${guest.table} (${tableInfo.name})`;
-        
-        // Set seat number if available
-        if (guest.seat) {
-            seatNumberElement.textContent = getSeatNumberText(guest.seat, currentLanguage);
-        } else {
-            seatNumberElement.textContent = '';
-        }
-        
-        // Find and display tablemates
-        displayTablemates(guest);
-        
-        // Highlight the guest's table on the map
-        highlightTable(guest.table);
-        
-        // Show the result container
-        resultContainer.classList.remove('hidden');
-    }
+        )
+    );
+}
     
     function displayTablemates(guest) {
         // Clear previous tablemates
