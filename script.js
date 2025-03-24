@@ -21,6 +21,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (localStorage.getItem('weddinglanguage')) {
         currentLanguage = localStorage.getItem('weddinglanguage');
     }
+    // Add this logging code to check if data is loading
+console.log("DOM fully loaded");
+
+// Add an event listener to check when the search button is clicked
+document.getElementById('searchButton').addEventListener('click', function() {
+  console.log("Search button clicked");
+  console.log("Search input value:", document.getElementById('nameSearch').value);
+  console.log("Selected side:", document.querySelector('input[name="side"]:checked').value);
+  console.log("Guest list loaded:", window.guestList ? window.guestList.length + " guests" : "No guest list found");
+  
+  if (window.guestList && window.guestList.length > 0) {
+    console.log("First few guests:", window.guestList.slice(0, 3));
+  }
+});
     
     // Set initial active language button
     updateLanguageButtonState();
