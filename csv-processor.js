@@ -71,83 +71,84 @@ function processGuestData(csvContent) {
     arrangeTablesInCustomLayout(tables);
     
     // Create the venue layout
-    const venueLayout = {
-        width: 1000,
-        height: 800,
-        fixedElements: [
-            // Stage at the top
-            {
-                type: 'rectangle',
-                name: 'stage',
-                x: 500,
-                y: 80,
-                width: 500,
-                height: 70,
-                label: 'Stage'
-            },
-            // Bride and groom area
-            {
-                type: 'rectangle',
-                name: 'brideGroom',
-                x: 500,
-                y: 180,
-                width: 200,
-                height: 60,
-                label: 'Bride and Groom'
-            },
-            // Dance Floor
-            {
-                type: 'rectangle',
-                name: 'danceFloor',
-                x: 500,
-                y: 340,
-                width: 200,
-                height: 150,
-                label: 'Dance Floor'
-            },
-            // Cake area
-            {
-                type: 'rectangle',
-                name: 'cake',
-                x: 700,
-                y: 180,
-                width: 100,
-                height: 60,
-                label: 'Cake'
-            },
-            // Bar area
-            {
-                type: 'rectangle',
-                name: 'bar',
-                x: 150,
-                y: 180,
-                width: 100,
-                height: 60,
-                label: 'Bar'
-            },
-            // Gifts area
-            {
-                type: 'rectangle',
-                name: 'gifts',
-                x: 300,
-                y: 560,
-                width: 100,
-                height: 60,
-                label: 'Gifts'
-            },
-            // VIP Table
-            {
-                type: 'rectangle',
-                name: 'vipTable',
-                x: 500,
-                y: 560,
-                width: 150,
-                height: 60,
-                label: 'VIP Table'
-            }
-        ],
-        tables: tables
-    };
+    // Create the venue layout
+const venueLayout = {
+    width: 950,
+    height: 1300,
+    fixedElements: [
+        // Stage at the bottom
+        {
+            type: 'rectangle',
+            name: 'stage',
+            x: 475,
+            y: 1275,
+            width: 300,
+            height: 70,
+            label: 'Stage'
+        },
+        // Bride and Groom area on the right side
+        {
+            type: 'rectangle',
+            name: 'brideGroom',
+            x: 875,
+            y: 630,
+            width: 70,
+            height: 100,
+            label: 'Bride and Groom'
+        },
+        // Dance Floor in the center
+        {
+            type: 'rectangle',
+            name: 'danceFloor',
+            x: 475,
+            y: 975,
+            width: 300,
+            height: 300,
+            label: 'Dance Floor'
+        },
+        // Cake area on the right side
+        {
+            type: 'circle',
+            name: 'cake',
+            x: 875,
+            y: 760,
+            width: 70,
+            height: 70,
+            label: 'Cake'
+        },
+        // Bar area on the left side
+        {
+            type: 'rectangle',
+            name: 'bar',
+            x: 60,
+            y: 660,
+            width: 60,
+            height: 200,
+            label: 'Bar'
+        },
+        // Gifts area on the right side
+        {
+            type: 'rectangle',
+            name: 'gifts',
+            x: 875,
+            y: 430,
+            width: 70,
+            height: 100,
+            label: 'Gifts'
+        },
+        // VIP Table in the center-right area
+        {
+            type: 'rectangle',
+            name: 'vipTable',
+            x: 535,
+            y: 430,
+            width: 120,
+            height: 70,
+            label: 'VIP Table'
+        }
+    ],
+    tables: tables
+};
     
     // Create the guest list
     const guestList = [];
@@ -171,70 +172,66 @@ function processGuestData(csvContent) {
     };
 }
 
-// Function to arrange tables in a custom layout based on the document
+// Function to arrange tables in a custom layout based on the provided image
 function arrangeTablesInCustomLayout(tables) {
-    // Define table positions according to the document
+    // Define table positions according to the image
     const tablePositions = {
         // Row 1 (top row - tables 1-7)
-        1: { x: 200, y: 150 },
-        2: { x: 300, y: 150 },
-        3: { x: 400, y: 150 },
-        4: { x: 600, y: 150 },
-        5: { x: 700, y: 150 },
-        6: { x: 800, y: 150 },
-        7: { x: 900, y: 150 },
+        1: { x: 158, y: 126 },
+        2: { x: 264, y: 126 },
+        3: { x: 370, y: 126 },
+        4: { x: 476, y: 126 },
+        5: { x: 582, y: 126 },
+        6: { x: 688, y: 126 },
+        7: { x: 794, y: 126 },
         
         // Row 2 (tables 8-14)
-        8: { x: 200, y: 230 },
-        9: { x: 300, y: 230 },
-        10: { x: 400, y: 230 },
-        11: { x: 600, y: 230 },
-        12: { x: 700, y: 230 },
-        13: { x: 800, y: 230 },
-        14: { x: 900, y: 230 },
+        8: { x: 158, y: 202 },
+        9: { x: 264, y: 202 },
+        10: { x: 370, y: 202 },
+        11: { x: 476, y: 202 },
+        12: { x: 582, y: 202 },
+        13: { x: 688, y: 202 },
+        14: { x: 794, y: 202 },
         
         // Row 3 (tables 15-21)
-        15: { x: 200, y: 310 },
-        16: { x: 300, y: 310 },
-        17: { x: 400, y: 310 },
-        18: { x: 600, y: 310 },
-        19: { x: 700, y: 310 },
-        20: { x: 800, y: 310 },
-        21: { x: 900, y: 310 },
+        15: { x: 158, y: 278 },
+        16: { x: 264, y: 278 },
+        17: { x: 370, y: 278 },
+        18: { x: 476, y: 278 },
+        19: { x: 582, y: 278 },
+        20: { x: 688, y: 278 },
+        21: { x: 794, y: 278 },
         
         // Row 4 (tables 22-28)
-        22: { x: 200, y: 390 },
-        23: { x: 300, y: 390 },
-        24: { x: 400, y: 390 },
-        25: { x: 600, y: 390 },
-        26: { x: 700, y: 390 },
-        27: { x: 800, y: 390 },
-        28: { x: 900, y: 390 },
+        22: { x: 158, y: 354 },
+        23: { x: 264, y: 354 },
+        24: { x: 370, y: 354 },
+        25: { x: 476, y: 354 },
+        26: { x: 582, y: 354 },
+        27: { x: 688, y: 354 },
+        28: { x: 794, y: 354 },
         
         // Row 5 (tables 29-33)
-        29: { x: 200, y: 470 },
-        30: { x: 300, y: 470 },
-        31: { x: 400, y: 470 },
-        32: { x: 600, y: 470 },
-        33: { x: 700, y: 470 },
+        29: { x: 158, y: 430 },
+        30: { x: 264, y: 430 },
+        31: { x: 370, y: 430 },
+        32: { x: 688, y: 430 },
+        33: { x: 794, y: 430 },
         
-        // Right side extra tables (34-37)
-        34: { x: 800, y: 470 },
-        35: { x: 900, y: 470 },
-        36: { x: 800, y: 550 },
-        37: { x: 900, y: 550 },
-        
-        // Bottom side extra tables (38-41)
-        38: { x: 800, y: 630 },
-        39: { x: 900, y: 630 },
-        40: { x: 800, y: 710 },
-        41: { x: 900, y: 710 },
-        
-        // Left side extra tables (42-45)
-        42: { x: 200, y: 630 },
-        43: { x: 300, y: 630 },
-        44: { x: 200, y: 710 },
-        45: { x: 300, y: 710 }
+        // Tables around the dance floor
+        34: { x: 264, y: 826 },
+        35: { x: 794, y: 826 },
+        36: { x: 158, y: 902 },
+        37: { x: 688, y: 902 },
+        38: { x: 264, y: 978 },
+        39: { x: 794, y: 978 },
+        40: { x: 158, y: 1054 },
+        41: { x: 688, y: 1054 },
+        42: { x: 264, y: 1130 },
+        43: { x: 794, y: 1130 },
+        44: { x: 158, y: 1206 },
+        45: { x: 688, y: 1206 },
     };
     
     // Apply positions to tables
@@ -248,7 +245,7 @@ function arrangeTablesInCustomLayout(tables) {
             // place them along the bottom
             const extraIndex = table.id - 45;
             table.x = 400 + (extraIndex * 80);
-            table.y = 710;
+            table.y = 1250;
         }
     });
 }
