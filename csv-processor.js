@@ -346,23 +346,43 @@ function validateCSV(csvContent) {
     return true;
 }
 
+
 // Initialize UI elements after data is loaded
 function initializeUI() {
     console.log('Initializing UI...');
     
-    // Initialize the venue map if the function exists in global scope
+    // Explicitly initialize the venue map
     if (window.venueLayout && typeof window.initializeVenueMap === 'function') {
+        console.log('Calling initializeVenueMap from initializeUI');
         window.initializeVenueMap();
-        console.log('Venue map initialized');
     } else {
-        // Fallback to local initializeVenueMap function if it exists
-        if (window.venueLayout && typeof initializeVenueMap === 'function') {
-            initializeVenueMap();
-            console.log('Venue map initialized (local function)');
-        } else {
-            console.error('initializeVenueMap function not found or venue layout not available');
-        }
+        console.error('Cannot initialize venue map: ', 
+                     window.venueLayout ? 'venueLayout exists' : 'venueLayout missing',
+                     typeof window.initializeVenueMap === 'function' ? 'function exists' : 'function missing');
     }
+    
+    // Apply translations if the function exists
+    if (typeof window.applyTranslations === 'function') {
+        window.applyTranslations();
+        console.log('Translations applied');
+    } else {
+        console.warn('applyTranslations function not found');
+    }
+    
+    // Check if all elements are properly loaded
+    const guestListLoaded = window.guestList && Array.isArray(window.guestList) && window.guestList.length > 0;
+    console.log(`Guest list loaded: ${guestListLoaded ? 'YES' : 'NO'}`);
+    
+    const venueLayoutLoaded = window.venueLayout && Array.isArray(window.venueLayout.tables);
+    console.log(`Venue layout loaded: ${venueLayoutLoaded ? 'YES' : 'NO'}`);
+    
+    // Enable UI elements now that data is loaded
+    const searchButton = document.getElementById('searchButton');
+    if (searchButton) {
+        searchButton.disabled = false;
+        console.log('Search button enabled');
+    }
+}
     
     // Apply translations if the function exists
     if (typeof applyTranslations === 'function') {
