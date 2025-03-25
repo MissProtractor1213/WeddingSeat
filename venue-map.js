@@ -1,16 +1,24 @@
 // Define the venue map initialization function in the global scope
 window.initializeVenueMap = function() {
+    console.log('initializeVenueMap called');
+    
+    // Ensure we have access to the translations and current language
+    if (typeof window.currentLanguage === 'undefined') {
+        window.currentLanguage = 'en';
+        console.log('Setting default language in venue map');
+    }
+    
     // Ensure venue layout exists
     if (!window.venueLayout) {
         console.error('Venue layout is not initialized');
-        return;
+        return false;
     }
     
     // Get the venueMapElement
     const venueMapElement = document.getElementById('venueMap');
     if (!venueMapElement) {
         console.error('Venue map element not found');
-        return;
+        return false;
     }
     
     // Clear any existing elements
@@ -52,8 +60,8 @@ window.initializeVenueMap = function() {
             
             // Set the label based on language
             const labelKey = element.name + '-label';
-            if (translations[currentLanguage] && translations[currentLanguage][labelKey]) {
-                elementDiv.textContent = translations[currentLanguage][labelKey];
+            if (translations[window.currentLanguage] && translations[window.currentLanguage][labelKey]) {
+                elementDiv.textContent = translations[window.currentLanguage][labelKey];
             } else {
                 elementDiv.textContent = element.label;
             }
@@ -77,10 +85,12 @@ window.initializeVenueMap = function() {
         venueMapElement.appendChild(tableDiv);
     });
     
+    console.log('Map dimensions:', mapWidth, mapHeight);
+    console.log('Number of tables drawn:', window.venueLayout.tables.length);
+    if (window.venueLayout.tables.length > 0) {
+        console.log('First table position:', window.venueLayout.tables[0].x, window.venueLayout.tables[0].y);
+    }
+    
     console.log('Venue map initialized with', window.venueLayout.tables.length, 'tables');
+    return true;
 };
-
-// Set up global variable for language if not already defined
-if (typeof currentLanguage === 'undefined') {
-    window.currentLanguage = 'en';
-}
