@@ -442,3 +442,120 @@ footer {
         width: 70px;
     }
 }
+/* Improved Venue Map Styling */
+.venue-map {
+    height: 600px; /* Increased height to better display all tables */
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    position: relative;
+    overflow: auto;
+    background-color: #faf8f5;
+    margin-bottom: 25px;
+    /* Critical fix: ensure the map is visible */
+    display: block !important;
+    visibility: visible !important;
+    min-height: 400px;
+}
+
+/* Table styling improvements */
+.table {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid #c896e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    background-color: #fff;
+    transition: all 0.3s;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    /* Add minimum dimensions */
+    min-width: 40px;
+    min-height: 40px;
+    /* Add shadow for better visibility */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Ensure text doesn't overflow */
+    overflow: hidden;
+    padding: 2px;
+}
+
+/* Fixed element styling improvements */
+.fixed-element {
+    position: absolute;
+    background-color: #f8f3fb;
+    border: 1px solid #dccce9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: #7a6d81;
+    text-align: center;
+    /* Add shadow for better visibility */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Improve text handling */
+    overflow: hidden;
+    padding: 5px;
+    /* Better z-index handling */
+    z-index: 5;
+}
+
+/* Improved highlight styling */
+.highlighted {
+    border-color: #c896e0;
+    background-color: #c896e0;
+    color: white;
+    box-shadow: 0 0 15px rgba(200, 150, 224, 0.6);
+    transform: scale(1.1);
+    z-index: 10;
+    /* Add animation */
+    animation: pulse 1.5s infinite alternate;
+}
+
+/* Pulse animation for highlighted table */
+@keyframes pulse {
+    from {
+        box-shadow: 0 0 10px rgba(200, 150, 224, 0.6);
+    }
+    to {
+        box-shadow: 0 0 20px rgba(200, 150, 224, 0.9);
+    }
+}
+
+/* Fix for empty map message */
+.empty-map-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 20px;
+    text-align: center;
+    color: #888;
+    font-style: italic;
+}
+
+/* Improved responsive design for venue map */
+@media (max-width: 768px) {
+    .venue-map {
+        height: 500px;
+    }
+    
+    .table {
+        font-size: 0.8rem;
+    }
+    
+    .fixed-element {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .venue-map {
+        height: 400px;
+    }
+    
+    .table {
+        font-size: 0.7rem;
+    }
+}
