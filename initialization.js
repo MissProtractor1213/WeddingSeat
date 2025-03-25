@@ -34,6 +34,14 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingMessage.remove();
         }
         
+        // Explicitly initialize the venue map
+        if (typeof window.initializeVenueMap === 'function') {
+            console.log('Explicitly calling initializeVenueMap');
+            window.initializeVenueMap();
+        } else {
+            console.error('initializeVenueMap function not available');
+        }
+        
         // Update UI elements to show everything is ready
         const searchButton = document.getElementById('searchButton');
         if (searchButton) {
