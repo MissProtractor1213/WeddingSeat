@@ -98,7 +98,7 @@ h2 {
     right: 0;
     bottom: 0;
     background-image: url('IMG_4948.png'); /* Your floral frame image */
-    background-size: 100% 100%; /* This stretches the image to fill the container */
+    background-size: 100% 120%; /* This stretches the image to fill the container */
     background-position: center;
     background-repeat: no-repeat;
     pointer-events: none; /* This allows clicks to pass through to elements below */
