@@ -14,12 +14,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const backButton = document.getElementById('backButton');
     const tryAgainButton = document.getElementById('tryAgainButton');
     
-    // Set default language
-    let currentLanguage = 'en';
+    // Set default language as a global variable
+    window.currentLanguage = 'en';
     
     // Check if there's a saved language preference in localStorage
     if (localStorage.getItem('weddinglanguage')) {
-        currentLanguage = localStorage.getItem('weddinglanguage');
+        window.currentLanguage = localStorage.getItem('weddinglanguage');
     }
     
     // Add this logging code to check if data is loading
@@ -80,21 +80,27 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to set language
     function setLanguage(lang) {
-        currentLanguage = lang;
+        window.currentLanguage = lang;
         
         // Save language preference to localStorage
-        localStorage.setItem('weddinglanguage', currentLanguage);
+        localStorage.setItem('weddinglanguage', window.currentLanguage);
         
         // Update the language button state
         updateLanguageButtonState();
         
         // Apply translations
         applyTranslations();
+        
+        // Reinitialize the venue map with new language
+        if (typeof window.initializeVenueMap === 'function') {
+            console.log('Reinitializing venue map after language change');
+            window.initializeVenueMap();
+        }
     }
     
     // Function to update language button state
     function updateLanguageButtonState() {
-        if (currentLanguage === 'en') {
+        if (window.currentLanguage === 'en') {
             englishBtn.classList.add('active');
             vietnameseBtn.classList.remove('active');
         } else {
@@ -117,11 +123,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Handle input placeholders separately
             if (element.tagName === 'INPUT') {
-                element.placeholder = translations[currentLanguage][key];
+                element.placeholder = translations[window.currentLanguage][key];
             } else if (element.tagName === 'BUTTON') {
-                element.textContent = translations[currentLanguage][key];
+                element.textContent = translations[window.currentLanguage][key];
             } else {
-                element.textContent = translations[currentLanguage][key];
+                element.textContent = translations[window.currentLanguage][key];
             }
         });
         
@@ -130,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const seatNumberMatch = seatNumberElement.textContent.match(/\d+/);
             if (seatNumberMatch) {
                 const seatNumber = seatNumberMatch[0];
-                seatNumberElement.textContent = getSeatNumberText(seatNumber, currentLanguage);
+                seatNumberElement.textContent = getSeatNumberText(seatNumber, window.currentLanguage);
             }
         }
     }
@@ -202,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 // Set the message based on language
-                const message = currentLanguage === 'en' 
+                const message = window.currentLanguage === 'en' 
                     ? `Showing closest match for "${nameSearchInput.value}"`
                     : `Hiển thị kết quả gần nhất cho "${nameSearchInput.value}"`;
                 
@@ -371,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Set seat number if available
         if (guest.seat) {
-            seatNumberElement.textContent = getSeatNumberText(guest.seat, currentLanguage);
+            seatNumberElement.textContent = getSeatNumberText(guest.seat, window.currentLanguage);
         } else {
             seatNumberElement.textContent = '';
         }
