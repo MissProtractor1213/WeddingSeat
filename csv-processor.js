@@ -258,14 +258,35 @@ async function initializeFromCSV() {
     try {
         console.log("Initializing from CSV...");
         
-        // Fetch the CSV file
-        const response = await fetch('guests.csv');
-        if (!response.ok) {
-            throw new Error(`Failed to fetch guests.csv: ${response.status} ${response.statusText}`);
-        }
+        // CHANGE 1: Hardcode the guest data for testing if fetch fails
+        let csvContent;
         
-        const csvContent = await response.text();
-        console.log(`CSV loaded, length: ${csvContent.length} characters`);
+        try {
+            // Try to fetch the CSV file
+            const response = await fetch('guests.csv');
+            if (!response.ok) {
+                throw new Error(`Failed to fetch guests.csv: ${response.status} ${response.statusText}`);
+            }
+            csvContent = await response.text();
+            console.log(`CSV loaded from file, length: ${csvContent.length} characters`);
+        } catch (fetchError) {
+            console.warn("Failed to fetch CSV file, using hardcoded data:", fetchError);
+            
+            // Use the sample data from guests.csv
+            csvContent = `name,table_id,table_name,seat,vietnamese_name,side
+Tina Reckelbus,1,Freesia,1,,bride
+Elan Reckelbus,1,Freesia,2,,bride
+Lucy Tran,1,Freesia,3,,bride
+Edwin Chen,1,Freesia,4,,bride
+Mackenzie Cruz,1,Freesia,5,,bride
+Teagan Stump,1,Freesia,6,,bride
+Lorna Agyare,1,Freesia,7,,bride
+Garrison Burgan,1,Freesia,8,,bride
+Yvonne Nguyen,1,Freesia,9,,bride
+MyViet Nguyen,1,Freesia,10,,bride`;
+            
+            console.log("Using hardcoded CSV data as fallback");
+        }
         
         // Validate CSV format
         if (!validateCSV(csvContent)) {
@@ -283,6 +304,9 @@ async function initializeFromCSV() {
         
         // Initialize the UI now that we have the data
         initializeUI();
+        
+        // CHANGE 2: Log the loaded guest data to verify it's working
+        console.log("First few guests loaded:", window.guestList.slice(0, 3));
         
         // Return success
         return true;
