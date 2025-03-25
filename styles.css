@@ -84,9 +84,9 @@ h2 {
 .floral-card {
     position: relative;
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     margin: 0 auto;
-    padding: 60px; /* This padding creates space for the floral frame */
+    padding: 80px; /* This padding creates space for the floral frame */
 }
 
 /* This creates the floral frame using a pseudo-element */
