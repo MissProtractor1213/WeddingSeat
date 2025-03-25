@@ -154,3 +154,199 @@ document.addEventListener('DOMContentLoaded', function() {
         retryButton.addEventListener('click', window.retryInitialization);
     }
 });
+// Add this to the initialization.js file or create a new script file
+
+// Function to initialize the application
+function initializeApplication() {
+    console.log('Initializing wedding seating application...');
+    
+    // IMPORTANT FIX: Make sure translations are accessible globally
+    window.translations = translations;
+    
+    // Make sure we have the venue map initialization function
+    if (typeof window.initializeVenueMap !== 'function') {
+        console.error('Venue map initialization function not found');
+        // Display an error message
+        const errorMessage = document.getElementById('errorMessage');
+        if (errorMessage) {
+            errorMessage.textContent = 'Could not initialize venue map. Please refresh the page.';
+            errorMessage.classList.remove('hidden');
+        }
+        return;
+    }
+    
+    // Initialize the venue map
+    try {
+        console.log('Calling initializeVenueMap...');
+        const result = window.initializeVenueMap();
+        console.log('Venue map initialization result:', result);
+    } catch (error) {
+        console.error('Error initializing venue map:', error);
+    }
+    
+    // Attach event listener to search button
+    const searchButton = document.getElementById('searchButton');
+    if (searchButton) {
+        searchButton.addEventListener('click', function() {
+            const nameInput = document.getElementById('nameSearch');
+            if (nameInput && nameInput.value.trim()) {
+                searchGuest(nameInput.value.trim());
+            }
+        });
+    }
+    
+    // Initialize language switchers
+    initializeLanguageSwitchers();
+    
+    console.log('Application initialization complete');
+}
+
+// Function to search for a guest
+function searchGuest(name) {
+    console.log('Searching for guest:', name);
+    
+    // In a real application, you would search your guest list here
+    // For demonstration, we'll just show a sample result for any name
+    
+    const resultContainer = document.getElementById('resultContainer');
+    const noResultContainer = document.getElementById('noResultContainer');
+    
+    // Show the result
+    if (resultContainer) {
+        // Set guest name
+        const guestNameElement = document.getElementById('guestName');
+        if (guestNameElement) {
+            guestNameElement.textContent = name;
+        }
+        
+        // Set table name - for demo, we'll use Table 35
+        const tableNameElement = document.getElementById('tableName');
+        if (tableNameElement) {
+            tableNameElement.textContent = 'Table 35';
+        }
+        
+        // Highlight the table
+        highlightTable(35);
+        
+        // Show the result container
+        resultContainer.classList.remove('hidden');
+        
+        // Hide no result container if it's visible
+        if (noResultContainer) {
+            noResultContainer.classList.add('hidden');
+        }
+    }
+}
+
+// Function to highlight a table
+function highlightTable(tableId) {
+    console.log('Highlighting table:', tableId);
+    
+    // Remove highlight from all tables
+    document.querySelectorAll('.table').forEach(table => {
+        table.classList.remove('highlighted');
+    });
+    
+    // Add highlight to the selected table
+    const tableElement = document.getElementById(`table-${tableId}`);
+    if (tableElement) {
+        tableElement.classList.add('highlighted');
+        
+        // Scroll to make sure the table is visible
+        tableElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+        console.error(`Table element with ID table-${tableId} not found`);
+    }
+}
+
+// Function to initialize language switchers
+function initializeLanguageSwitchers() {
+    const englishBtn = document.getElementById('englishBtn');
+    const vietnameseBtn = document.getElementById('vietnameseBtn');
+    
+    if (englishBtn) {
+        englishBtn.addEventListener('click', function() {
+            setLanguage('en');
+        });
+    }
+    
+    if (vietnameseBtn) {
+        vietnameseBtn.addEventListener('click', function() {
+            setLanguage('vi');
+        });
+    }
+}
+
+// Function to set language
+function setLanguage(lang) {
+    console.log('Setting language to:', lang);
+    
+    window.currentLanguage = lang;
+    
+    // Save preference to localStorage
+    localStorage.setItem('weddinglanguage', lang);
+    
+    // Update UI elements
+    updateLanguageButtons();
+    applyTranslations();
+    
+    // Update venue map
+    if (typeof window.initializeVenueMap === 'function') {
+        window.initializeVenueMap();
+    }
+}
+
+// Function to update language buttons
+function updateLanguageButtons() {
+    const englishBtn = document.getElementById('englishBtn');
+    const vietnameseBtn = document.getElementById('vietnameseBtn');
+    
+    if (englishBtn && vietnameseBtn) {
+        if (window.currentLanguage === 'en') {
+            englishBtn.classList.add('active');
+            vietnameseBtn.classList.remove('active');
+        } else {
+            englishBtn.classList.remove('active');
+            vietnameseBtn.classList.add('active');
+        }
+    }
+}
+
+// Function to apply translations
+function applyTranslations() {
+    const elements = document.querySelectorAll('[data-lang-key]');
+    
+    elements.forEach(element => {
+        const key = element.getAttribute('data-lang-key');
+        
+        if (window.translations && 
+            window.translations[window.currentLanguage] && 
+            window.translations[window.currentLanguage][key]) {
+            
+            if (element.tagName === 'INPUT') {
+                element.placeholder = window.translations[window.currentLanguage][key];
+            } else {
+                element.textContent = window.translations[window.currentLanguage][key];
+            }
+        }
+    });
+}
+
+// Initialize the application when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing application...');
+    
+    // Set default language if not set
+    if (!window.currentLanguage) {
+        window.currentLanguage = localStorage.getItem('weddinglanguage') || 'en';
+    }
+    
+    // Initialize the application
+    initializeApplication();
+});
+
+// Make functions available globally
+window.searchGuest = searchGuest;
+window.highlightTable = highlightTable;
+window.setLanguage = setLanguage;
+window.applyTranslations = applyTranslations;
