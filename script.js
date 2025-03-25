@@ -408,15 +408,7 @@ document.addEventListener('DOMContentLoaded', function() {
             tablematesListElement.appendChild(li);
         });
     }
-    
-    // Define the initializeVenueMap function in the global scope
-    window.initializeVenueMap = function() {
-        // Ensure venue layout exists
-        if (!window.venueLayout) {
-            console.error('Venue layout is not initialized');
-            return;
-        }
-        
+         
         // Get the venueMapElement
         const venueMapElement = document.getElementById('venueMap');
         if (!venueMapElement) {
