@@ -71,84 +71,83 @@ function processGuestData(csvContent) {
     arrangeTablesInCustomLayout(tables);
     
     // Create the venue layout
-    // Create the venue layout
-const venueLayout = {
-    width: 950,
-    height: 1300,
-    fixedElements: [
-        // Stage at the bottom
-        {
-            type: 'rectangle',
-            name: 'stage',
-            x: 475,
-            y: 1275,
-            width: 300,
-            height: 70,
-            label: 'Stage'
-        },
-        // Bride and Groom area on the right side
-        {
-            type: 'rectangle',
-            name: 'brideGroom',
-            x: 875,
-            y: 630,
-            width: 70,
-            height: 100,
-            label: 'Bride and Groom'
-        },
-        // Dance Floor in the center
-        {
-            type: 'rectangle',
-            name: 'danceFloor',
-            x: 475,
-            y: 975,
-            width: 300,
-            height: 300,
-            label: 'Dance Floor'
-        },
-        // Cake area on the right side
-        {
-            type: 'circle',
-            name: 'cake',
-            x: 875,
-            y: 760,
-            width: 70,
-            height: 70,
-            label: 'Cake'
-        },
-        // Bar area on the left side
-        {
-            type: 'rectangle',
-            name: 'bar',
-            x: 60,
-            y: 660,
-            width: 60,
-            height: 200,
-            label: 'Bar'
-        },
-        // Gifts area on the right side
-        {
-            type: 'rectangle',
-            name: 'gifts',
-            x: 875,
-            y: 430,
-            width: 70,
-            height: 100,
-            label: 'Gifts'
-        },
-        // VIP Table in the center-right area
-        {
-            type: 'rectangle',
-            name: 'vipTable',
-            x: 535,
-            y: 430,
-            width: 120,
-            height: 70,
-            label: 'VIP Table'
-        }
-    ],
-    tables: tables
-};
+    const venueLayout = {
+        width: 950,
+        height: 1300,
+        fixedElements: [
+            // Stage at the bottom
+            {
+                type: 'rectangle',
+                name: 'stage',
+                x: 475,
+                y: 1275,
+                width: 300,
+                height: 70,
+                label: 'Stage'
+            },
+            // Bride and Groom area on the right side
+            {
+                type: 'rectangle',
+                name: 'brideGroom',
+                x: 875,
+                y: 630,
+                width: 70,
+                height: 100,
+                label: 'Bride and Groom'
+            },
+            // Dance Floor in the center
+            {
+                type: 'rectangle',
+                name: 'danceFloor',
+                x: 475,
+                y: 975,
+                width: 300,
+                height: 300,
+                label: 'Dance Floor'
+            },
+            // Cake area on the right side
+            {
+                type: 'circle',
+                name: 'cake',
+                x: 875,
+                y: 760,
+                width: 70,
+                height: 70,
+                label: 'Cake'
+            },
+            // Bar area on the left side
+            {
+                type: 'rectangle',
+                name: 'bar',
+                x: 60,
+                y: 660,
+                width: 60,
+                height: 200,
+                label: 'Bar'
+            },
+            // Gifts area on the right side
+            {
+                type: 'rectangle',
+                name: 'gifts',
+                x: 875,
+                y: 430,
+                width: 70,
+                height: 100,
+                label: 'Gifts'
+            },
+            // VIP Table in the center-right area
+            {
+                type: 'rectangle',
+                name: 'vipTable',
+                x: 535,
+                y: 430,
+                width: 120,
+                height: 70,
+                label: 'VIP Table'
+            }
+        ],
+        tables: tables
+    };
     
     // Create the guest list
     const guestList = [];
@@ -250,6 +249,74 @@ function arrangeTablesInCustomLayout(tables) {
     });
 }
 
+// Validate CSV format
+function validateCSV(csvContent) {
+    // Check if CSV content exists
+    if (!csvContent || csvContent.trim() === '') {
+        console.error("CSV content is empty");
+        return false;
+    }
+    
+    // Split into lines
+    const lines = csvContent.split(/\r\n|\n/);
+    
+    // Check if we have header and at least one row
+    if (lines.length < 2) {
+        console.error("CSV has insufficient lines");
+        return false;
+    }
+    
+    // Get the header and check for expected columns
+    const header = lines[0].split(',');
+    const requiredColumns = ['name', 'table_id', 'table_name', 'side'];
+    const missingColumns = requiredColumns.filter(col => !header.includes(col));
+    
+    if (missingColumns.length > 0) {
+        console.error("CSV is missing required columns:", missingColumns);
+        return false;
+    }
+    
+    console.log("CSV format appears valid");
+    return true;
+}
+
+// Initialize UI elements after data is loaded
+function initializeUI() {
+    console.log('Initializing UI...');
+    
+    // Explicitly initialize the venue map
+    if (window.venueLayout && typeof window.initializeVenueMap === 'function') {
+        console.log('Calling initializeVenueMap from initializeUI');
+        window.initializeVenueMap();
+    } else {
+        console.error('Cannot initialize venue map: ', 
+                    window.venueLayout ? 'venueLayout exists' : 'venueLayout missing',
+                    typeof window.initializeVenueMap === 'function' ? 'function exists' : 'function missing');
+    }
+    
+    // Apply translations if the function exists
+    if (typeof window.applyTranslations === 'function') {
+        window.applyTranslations();
+        console.log('Translations applied');
+    } else {
+        console.warn('applyTranslations function not found');
+    }
+    
+    // Check if all elements are properly loaded
+    const guestListLoaded = window.guestList && Array.isArray(window.guestList) && window.guestList.length > 0;
+    console.log(`Guest list loaded: ${guestListLoaded ? 'YES' : 'NO'}`);
+    
+    const venueLayoutLoaded = window.venueLayout && Array.isArray(window.venueLayout.tables);
+    console.log(`Venue layout loaded: ${venueLayoutLoaded ? 'YES' : 'NO'}`);
+    
+    // Enable UI elements now that data is loaded
+    const searchButton = document.getElementById('searchButton');
+    if (searchButton) {
+        searchButton.disabled = false;
+        console.log('Search button enabled');
+    }
+}
+
 // This function loads the CSV file and initializes the data
 async function initializeFromCSV() {
     try {
@@ -312,98 +379,6 @@ MyViet Nguyen,1,Freesia,10,,bride`;
         document.getElementById('errorMessage').textContent = `Failed to load guest data: ${error.message}`;
         document.getElementById('errorMessage').classList.remove('hidden');
         return false;
-    }
-}
-
-// Validate CSV format
-function validateCSV(csvContent) {
-    // Check if CSV content exists
-    if (!csvContent || csvContent.trim() === '') {
-        console.error("CSV content is empty");
-        return false;
-    }
-    
-    // Split into lines
-    const lines = csvContent.split(/\r\n|\n/);
-    
-    // Check if we have header and at least one row
-    if (lines.length < 2) {
-        console.error("CSV has insufficient lines");
-        return false;
-    }
-    
-    // Get the header and check for expected columns
-    const header = lines[0].split(',');
-    const requiredColumns = ['name', 'table_id', 'table_name', 'side'];
-    const missingColumns = requiredColumns.filter(col => !header.includes(col));
-    
-    if (missingColumns.length > 0) {
-        console.error("CSV is missing required columns:", missingColumns);
-        return false;
-    }
-    
-    console.log("CSV format appears valid");
-    return true;
-}
-
-
-// Initialize UI elements after data is loaded
-function initializeUI() {
-    console.log('Initializing UI...');
-    
-    // Explicitly initialize the venue map
-    if (window.venueLayout && typeof window.initializeVenueMap === 'function') {
-        console.log('Calling initializeVenueMap from initializeUI');
-        window.initializeVenueMap();
-    } else {
-        console.error('Cannot initialize venue map: ', 
-                     window.venueLayout ? 'venueLayout exists' : 'venueLayout missing',
-                     typeof window.initializeVenueMap === 'function' ? 'function exists' : 'function missing');
-    }
-    
-    // Apply translations if the function exists
-    if (typeof window.applyTranslations === 'function') {
-        window.applyTranslations();
-        console.log('Translations applied');
-    } else {
-        console.warn('applyTranslations function not found');
-    }
-    
-    // Check if all elements are properly loaded
-    const guestListLoaded = window.guestList && Array.isArray(window.guestList) && window.guestList.length > 0;
-    console.log(`Guest list loaded: ${guestListLoaded ? 'YES' : 'NO'}`);
-    
-    const venueLayoutLoaded = window.venueLayout && Array.isArray(window.venueLayout.tables);
-    console.log(`Venue layout loaded: ${venueLayoutLoaded ? 'YES' : 'NO'}`);
-    
-    // Enable UI elements now that data is loaded
-    const searchButton = document.getElementById('searchButton');
-    if (searchButton) {
-        searchButton.disabled = false;
-        console.log('Search button enabled');
-    }
-}
-    
-    // Apply translations if the function exists
-    if (typeof applyTranslations === 'function') {
-        applyTranslations();
-        console.log('Translations applied');
-    } else {
-        console.warn('applyTranslations function not found');
-    }
-    
-    // Check if all elements are properly loaded
-    const guestListLoaded = window.guestList && Array.isArray(window.guestList) && window.guestList.length > 0;
-    console.log(`Guest list loaded: ${guestListLoaded ? 'YES' : 'NO'}`);
-    
-    const venueLayoutLoaded = window.venueLayout && Array.isArray(window.venueLayout.tables);
-    console.log(`Venue layout loaded: ${venueLayoutLoaded ? 'YES' : 'NO'}`);
-    
-    // Enable UI elements now that data is loaded
-    const searchButton = document.getElementById('searchButton');
-    if (searchButton) {
-        searchButton.disabled = false;
-        console.log('Search button enabled');
     }
 }
 
