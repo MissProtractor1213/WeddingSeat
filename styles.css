@@ -345,13 +345,88 @@ button:hover {
     text-align: center;
 }
 
-.highlighted {
+/* Improved Table Highlighting */
+
+/* Make table highlight more prominent */
+.table.highlighted {
     border-color: #c896e0;
     background-color: #c896e0;
     color: white;
-    box-shadow: 0 0 15px rgba(200, 150, 224, 0.6);
-    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(200, 150, 224, 0.8);
+    transform: scale(1.2);
+    z-index: 100;
+    /* Add animation */
+    animation: pulse 1.5s infinite alternate;
+}
+
+/* Pulse animation for highlighted table */
+@keyframes pulse {
+    from {
+        box-shadow: 0 0 15px rgba(200, 150, 224, 0.7);
+    }
+    to {
+        box-shadow: 0 0 25px rgba(200, 150, 224, 1);
+    }
+}
+
+/* Improve venue map display */
+.venue-map {
+    height: 500px;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    position: relative;
+    overflow: auto;
+    background-color: #faf8f5;
+    margin-bottom: 25px;
+    /* Critical fix: ensure the map is visible */
+    display: block !important;
+    visibility: visible !important;
+}
+
+/* Improve table styling */
+.table {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid #c896e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    background-color: #fff;
+    transition: all 0.3s;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Ensure tables are visible and clickable */
     z-index: 10;
+    cursor: pointer;
+}
+
+/* Flash animation for newly loaded tables */
+@keyframes flash {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.table-new {
+    animation: flash 0.5s;
+}
+
+/* Improve fixed element styling */
+.fixed-element {
+    position: absolute;
+    background-color: #f8f3fb;
+    border: 1px solid #dccce9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: #7a6d81;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Better z-index handling */
+    z-index: 5;
 }
 
 /* Utility Classes */
