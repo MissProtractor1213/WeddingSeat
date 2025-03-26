@@ -149,30 +149,54 @@ document.addEventListener('DOMContentLoaded', function() {
     // Make the applyTranslations function globally available
     window.applyTranslations = applyTranslations;
     
+    // FIXED: Enhanced search guest function
     function searchGuest() {
         console.log("Search function called");
         
-        // ADDED DEBUG: Check if guest list exists
+        // Check if guest list exists and venue layout exists
         if (!window.guestList || !Array.isArray(window.guestList) || window.guestList.length === 0) {
             console.error("Guest list is not properly loaded. Current value:", window.guestList);
-            const errorMsg = document.getElementById('errorMessage');
-            if (errorMsg) {
-                errorMsg.textContent = "Error: Guest list not loaded. Please try refreshing the page.";
-                errorMsg.classList.remove('hidden');
+            
+            // Try loading sample data if available
+            if (typeof window.loadSampleGuestData === 'function') {
+                console.log("Attempting to load sample guest data");
+                window.loadSampleGuestData();
+            } else {
+                const errorMsg = document.getElementById('errorMessage');
+                if (errorMsg) {
+                    errorMsg.textContent = "Error: Guest list not loaded. Please try refreshing the page.";
+                    errorMsg.classList.remove('hidden');
+                }
+                return;
             }
-            return;
+        }
+        
+        // Make sure venue layout exists
+        if (!window.venueLayout || !window.venueLayout.tables) {
+            console.error("Venue layout is not properly loaded. Current value:", window.venueLayout);
+            if (typeof window.initializeVenueMap === 'function') {
+                console.log("Attempting to initialize venue map");
+                window.initializeVenueMap();
+            }
         }
         
         // Get the search input and normalize it
         const searchName = nameSearchInput.value.trim().toLowerCase();
         
         // Get the selected side
-        const selectedSide = document.querySelector('input[name="side"]:checked').value;
+        const sideInput = document.querySelector('input[name="side"]:checked');
+        if (!sideInput) {
+            console.error("No side selected");
+            return;
+        }
+        const selectedSide = sideInput.value;
         
         console.log(`Searching for "${searchName}" on "${selectedSide}" side`);
         
         // ADDED DEBUG: Log the guest list for debugging
-        console.log("Available guests:", window.guestList.map(g => g.name));
+        if (window.guestList) {
+            console.log("Available guests sample:", window.guestList.slice(0, 5).map(g => `${g.name} (Table ${g.table})`));
+        }
         
         // Hide previous results
         resultContainer.classList.add('hidden');
@@ -189,6 +213,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (guest) {
             console.log("Guest found:", guest);
+            
+            // ADDED: Make sure guest has a tableObject
+            if (!guest.tableObject && guest.table) {
+                // Try to find the table in venueLayout
+                if (window.venueLayout && window.venueLayout.tables) {
+                    guest.tableObject = window.venueLayout.tables.find(t => t.id === parseInt(guest.table));
+                    console.log("Added tableObject to guest:", guest.tableObject);
+                }
+            }
+            
             // Display guest information
             displayGuestInfo(guest);
             
@@ -232,6 +266,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // FIXED: Find guest function
     function findGuest(searchName, side) {
         // Make sure guestList exists
         if (!window.guestList || !Array.isArray(window.guestList)) {
@@ -244,12 +279,17 @@ document.addEventListener('DOMContentLoaded', function() {
         // IMPROVEMENT: Make search more robust by trimming spaces, handling special characters, etc.
         const normalizedSearchName = searchName.toLowerCase().trim();
         
-        // First try an exact match
+        // First try an exact match - case insensitive
         const exactMatch = window.guestList.find(guest => {
-            const guestNameNormalized = guest.name.toLowerCase().trim();
-            const vietnameseNameNormalized = guest.vietnamese_name ? guest.vietnamese_name.toLowerCase().trim() : '';
+            // Convert to lowercase and trim for case-insensitive comparison
+            const guestNameNormalized = (guest.name || "").toLowerCase().trim();
+            const vietnameseNameNormalized = (guest.vietnamese_name || "").toLowerCase().trim();
             
-            return guest.side === side && (
+            // Compare with guest side - convert to lowercase for consistent comparison
+            const guestSide = (guest.side || "").toLowerCase();
+            const searchSide = side.toLowerCase();
+            
+            return guestSide === searchSide && (
                 guestNameNormalized === normalizedSearchName ||
                 vietnameseNameNormalized === normalizedSearchName
             );
@@ -262,10 +302,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Then try partial matches
         const partialMatch = window.guestList.find(guest => {
-            const guestNameNormalized = guest.name.toLowerCase().trim();
-            const vietnameseNameNormalized = guest.vietnamese_name ? guest.vietnamese_name.toLowerCase().trim() : '';
+            // Converting to lowercase and trimming
+            const guestNameNormalized = (guest.name || "").toLowerCase().trim();
+            const vietnameseNameNormalized = (guest.vietnamese_name || "").toLowerCase().trim();
             
-            return guest.side === side && (
+            // Compare with guest side - convert to lowercase
+            const guestSide = (guest.side || "").toLowerCase();
+            const searchSide = side.toLowerCase();
+            
+            return guestSide === searchSide && (
                 guestNameNormalized.includes(normalizedSearchName) ||
                 normalizedSearchName.includes(guestNameNormalized) ||
                 vietnameseNameNormalized.includes(normalizedSearchName) ||
@@ -289,8 +334,10 @@ document.addEventListener('DOMContentLoaded', function() {
             return null;
         }
         
-        // Filter guests by side
-        const sideGuests = window.guestList.filter(guest => guest.side === side);
+        // Filter guests by side - normalize to lowercase for consistent comparison
+        const sideGuests = window.guestList.filter(guest => 
+            (guest.side || "").toLowerCase() === side.toLowerCase()
+        );
         
         // No guests on this side
         if (sideGuests.length === 0) {
@@ -304,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Calculate similarity score for each guest
         sideGuests.forEach(guest => {
             // Check similarity with English name
-            const nameScore = calculateSimilarity(searchName, guest.name.toLowerCase());
+            const nameScore = calculateSimilarity(searchName, (guest.name || "").toLowerCase());
             
             // Check similarity with Vietnamese name if available
             let vnNameScore = 0;
@@ -328,137 +375,3 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Only return a match if the similarity is above a threshold (0.4 or 40% similar)
         return bestScore > 0.4 ? bestMatch : null;
-    }
-    
-    // Function to calculate similarity between two strings (0 to 1)
-    function calculateSimilarity(str1, str2) {
-        // Simple implementation of Levenshtein distance for string similarity
-        const longer = str1.length > str2.length ? str1 : str2;
-        const shorter = str1.length > str2.length ? str2 : str1;
-        
-        // If the longer string is empty, both are empty strings
-        if (longer.length === 0) {
-            return 1.0;
-        }
-        
-        // If the shorter string is empty, similarity is 0
-        if (shorter.length === 0) {
-            return 0.0;
-        }
-        
-        // Create a matrix for dynamic programming approach
-        const matrix = Array(shorter.length + 1).fill().map(() => Array(longer.length + 1).fill(0));
-        
-        // Fill the first row and column
-        for (let i = 0; i <= shorter.length; i++) {
-            matrix[i][0] = i;
-        }
-        
-        for (let j = 0; j <= longer.length; j++) {
-            matrix[0][j] = j;
-        }
-        
-        // Fill the rest of the matrix
-        for (let i = 1; i <= shorter.length; i++) {
-            for (let j = 1; j <= longer.length; j++) {
-                const cost = shorter.charAt(i - 1) === longer.charAt(j - 1) ? 0 : 1;
-                matrix[i][j] = Math.min(
-                    matrix[i - 1][j] + 1,     // deletion
-                    matrix[i][j - 1] + 1,     // insertion
-                    matrix[i - 1][j - 1] + cost  // substitution
-                );
-            }
-        }
-        
-        // Calculate similarity as 1 - (distance / longer string length)
-        const distance = matrix[shorter.length][longer.length];
-        return 1.0 - (distance / longer.length);
-    }
-    
-    function displayGuestInfo(guest) {
-        // Set guest name and table information
-        guestNameElement.textContent = guest.name;
-        tableNameElement.textContent = guest.tableObject ? guest.tableObject.name : `Table ${guest.table}`;
-        
-        // Set seat number if available
-        if (guest.seat) {
-            seatNumberElement.textContent = getSeatNumberText(guest.seat, window.currentLanguage);
-        } else {
-            seatNumberElement.textContent = '';
-        }
-        
-        // Display tablemates
-        displayTablemates(guest);
-        
-        // Highlight the guest's table on the map
-        highlightTable(guest.table);
-        
-        // Show the result container
-        resultContainer.classList.remove('hidden');
-    }
-    
-    function displayTablemates(guest) {
-        // Clear previous tablemates
-        tablematesListElement.innerHTML = '';
-        
-        // Make sure guestList exists
-        if (!window.guestList || !Array.isArray(window.guestList)) {
-            console.error('Guest list is not properly initialized');
-            return;
-        }
-        
-        // Find all guests at the same table
-        const tablemates = window.guestList.filter(g => 
-            g.table === guest.table && g.name !== guest.name
-        );
-        
-        // Add each tablemate to the list
-        tablemates.forEach(tablemate => {
-            const li = document.createElement('li');
-            li.textContent = tablemate.name;
-            tablematesListElement.appendChild(li);
-        });
-    }
-    
-    function highlightTable(tableId) {
-        console.log(`Highlighting table ${tableId}`);
-        
-        // Remove highlight from all tables
-        document.querySelectorAll('.table').forEach(table => {
-            table.classList.remove('highlighted');
-        });
-        
-        // Add highlight to the selected table
-        const tableElement = document.getElementById(`table-${tableId}`);
-        if (tableElement) {
-            tableElement.classList.add('highlighted');
-            
-            // Scroll to make sure the table is visible
-            tableElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            console.log(`Table ${tableId} highlighted successfully`);
-        } else {
-            console.error(`Table element with ID table-${tableId} not found`);
-            
-            // Try to regenerate the venue map if table wasn't found
-            if (typeof window.initializeVenueMap === 'function') {
-                console.log('Attempting to reinitialize venue map');
-                window.initializeVenueMap();
-                
-                // Try highlighting again after a short delay
-                setTimeout(() => {
-                    const tableElement = document.getElementById(`table-${tableId}`);
-                    if (tableElement) {
-                        tableElement.classList.add('highlighted');
-                        tableElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        console.log(`Table ${tableId} highlighted after reinitialization`);
-                    }
-                }, 200);
-            }
-        }
-    }
-    
-    // Apply translations initially
-    applyTranslations();
-    
-    // Add a console message to help debugging
-    console.log("script.js fully loaded and initialized");
