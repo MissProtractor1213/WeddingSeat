@@ -8,84 +8,77 @@ window.initializeVenueMap = function() {
         console.log('Setting default language in venue map');
     }
     
-    // Create the venue layout based on the provided diagram
-    window.venueLayout = {
-        width: 1000,
-        height: 1200,
-        fixedElements: [
-            // VIP Table in the center of row 5
-            {
-                type: 'rectangle',
-                name: 'vipTable',
-                x: 500,
-                y: 445,
-                width: 180,
-                height: 80,
-                label: 'VIP Table'
-            },
-            // Gifts area on the right side
-            {
-                type: 'rectangle',
-                name: 'cakeGifts',
-                x: 880,
-                y: 445,
-                width: 100,
-                height: 100,
-                label: 'Gifts'
-            },
-            // Bar area on the left side
-            {
-                type: 'rectangle',
-                name: 'bar',
-                x: 70,
-                y: 660,
-                width: 80,
-                height: 200,
-                label: 'Bar'
-            },
-            // Bride and Groom area on the right side
-            {
-                type: 'rectangle',
-                name: 'brideGroom',
-                x: 880,
-                y: 650,
-                width: 100,
-                height: 120,
-                label: 'Bride and Groom'
-            },
-            // Cake area on the right side
-            {
-                type: 'circle',
-                name: 'cake',
-                x: 880,
-                y: 780,
-                width: 80,
-                height: 80,
-                label: 'Cake'
-            },
-            // Dance Floor in the center
-            {
-                type: 'rectangle',
-                name: 'danceFloor',
-                x: 500,
-                y: 940,
-                width: 280,
-                height: 280,
-                label: 'Dance Floor'
-            },
-            // Stage at the bottom
-            {
-                type: 'rectangle',
-                name: 'stage',
-                x: 500,
-                y: 1150,
-                width: 280,
-                height: 80,
-                label: 'Stage'
-            }
-        ],
-        tables: createWeddingTables()
-    };
+    // Check if venueLayout exists or create a default one
+    if (!window.venueLayout) {
+        console.log('Creating default venue layout');
+        window.venueLayout = {
+            width: 1000,
+            height: 1200,
+            fixedElements: [
+                // VIP Table in the center of row 5
+                {
+                    type: 'rectangle',
+                    name: 'vipTable',
+                    x: 500,
+                    y: 445,
+                    width: 180,
+                    height: 80,
+                    label: 'VIP Table'
+                },
+                // Gifts area on the right side
+                {
+                    type: 'rectangle',
+                    name: 'cakeGifts',
+                    x: 880,
+                    y: 445,
+                    width: 100,
+                    height: 100,
+                    label: 'Cake & Gifts'
+                },
+                // Bar area on the left side
+                {
+                    type: 'rectangle',
+                    name: 'bar',
+                    x: 70,
+                    y: 660,
+                    width: 80,
+                    height: 200,
+                    label: 'BAR'
+                },
+                // Bride and Groom area on the right side
+                {
+                    type: 'rectangle',
+                    name: 'brideGroom',
+                    x: 880,
+                    y: 650,
+                    width: 100,
+                    height: 120,
+                    label: 'Bride and Groom'
+                },
+                // Dance Floor in the center
+                {
+                    type: 'rectangle',
+                    name: 'danceFloor',
+                    x: 500,
+                    y: 940,
+                    width: 280,
+                    height: 280,
+                    label: 'Dance Floor'
+                },
+                // Stage at the bottom
+                {
+                    type: 'rectangle',
+                    name: 'stage',
+                    x: 500,
+                    y: 1150,
+                    width: 280,
+                    height: 80,
+                    label: 'Stage'
+                }
+            ],
+            tables: createWeddingTables()
+        };
+    }
     
     // Get the venueMapElement
     const venueMapElement = document.getElementById('venueMap');
@@ -98,18 +91,22 @@ window.initializeVenueMap = function() {
     venueMapElement.innerHTML = '';
     
     // Set the map dimensions based on the container
-    const mapWidth = venueMapElement.offsetWidth;
-    const mapHeight = venueMapElement.offsetHeight;
+    const mapWidth = venueMapElement.offsetWidth || 800;
+    const mapHeight = venueMapElement.offsetHeight || 600;
     
     // Calculate scaling factors
     const scaleX = mapWidth / window.venueLayout.width;
     const scaleY = mapHeight / window.venueLayout.height;
     
+    // Debug: Log scale factors
+    console.log(`Venue map scaling factors - X: ${scaleX}, Y: ${scaleY}`);
+    
     // Draw fixed elements (if any)
     if (window.venueLayout.fixedElements) {
-        window.venueLayout.fixedElements.forEach(element => {
+        window.venueLayout.fixedElements.forEach((element, index) => {
             const elementDiv = document.createElement('div');
             elementDiv.className = 'fixed-element';
+            elementDiv.id = `fixed-${element.name}-${index}`;
             elementDiv.style.left = `${element.x * scaleX - (element.width * scaleX / 2)}px`;
             elementDiv.style.top = `${element.y * scaleY - (element.height * scaleY / 2)}px`;
             elementDiv.style.width = `${element.width * scaleX}px`;
@@ -132,10 +129,6 @@ window.initializeVenueMap = function() {
             } else if (element.name === 'brideGroom') {
                 elementDiv.style.backgroundColor = '#fff0f5';
                 elementDiv.style.border = '2px solid #ff69b4';
-            } else if (element.name === 'cake') {
-                elementDiv.style.backgroundColor = '#fffacd';
-                elementDiv.style.border = '2px solid #daa520';
-                elementDiv.style.borderRadius = '50%';
             } else if (element.name === 'cakeGifts') {
                 elementDiv.style.backgroundColor = '#fffacd';
                 elementDiv.style.border = '2px solid #daa520';
@@ -153,24 +146,48 @@ window.initializeVenueMap = function() {
             
             venueMapElement.appendChild(elementDiv);
         });
+        
+        console.log(`Drew ${window.venueLayout.fixedElements.length} fixed elements on the venue map`);
     }
     
-    console.log(`Drawing ${window.venueLayout.tables.length} tables on venue map`);
-    
     // Draw tables
-    window.venueLayout.tables.forEach(table => {
-        const tableDiv = document.createElement('div');
-        tableDiv.className = 'table';
-        tableDiv.id = `table-${table.id}`;
-        tableDiv.style.left = `${table.x * scaleX - (table.size * scaleX / 2)}px`;
-        tableDiv.style.top = `${table.y * scaleY - (table.size * scaleY / 2)}px`;
-        tableDiv.style.width = `${table.size * scaleX}px`;
-        tableDiv.style.height = `${table.size * scaleY}px`;
-        tableDiv.textContent = `${table.id}`;  // Just show the table number, not the name
-        venueMapElement.appendChild(tableDiv);
-    });
+    if (window.venueLayout.tables && window.venueLayout.tables.length > 0) {
+        console.log(`Drawing ${window.venueLayout.tables.length} tables on venue map`);
+        
+        window.venueLayout.tables.forEach((table, index) => {
+            const tableDiv = document.createElement('div');
+            tableDiv.className = 'table table-new';
+            tableDiv.id = `table-${table.id}`;
+            
+            // Position and size the table
+            tableDiv.style.left = `${table.x * scaleX - (table.size * scaleX / 2)}px`;
+            tableDiv.style.top = `${table.y * scaleY - (table.size * scaleY / 2)}px`;
+            tableDiv.style.width = `${table.size * scaleX}px`;
+            tableDiv.style.height = `${table.size * scaleY}px`;
+            
+            // Display table number
+            tableDiv.textContent = `${table.id}`;
+            
+            // Add click event to highlight the table
+            tableDiv.addEventListener('click', function() {
+                console.log(`Table ${table.id} clicked`);
+                highlightTable(table.id);
+            });
+            
+            venueMapElement.appendChild(tableDiv);
+        });
+        
+        console.log('Tables drawn successfully');
+    } else {
+        console.warn('No tables to draw in venue map');
+        
+        // Add a message when no tables are available
+        const noTablesMessage = document.createElement('div');
+        noTablesMessage.className = 'empty-map-message';
+        noTablesMessage.textContent = 'Table information is loading or not available.';
+        venueMapElement.appendChild(noTablesMessage);
+    }
     
-    console.log('Venue map initialized with', window.venueLayout.tables.length, 'tables');
     return true;
 };
 
