@@ -156,7 +156,7 @@ function processGuestData(csvContent) {
         table.guests.forEach(guest => {
             guestList.push({
                 name: guest.name,
-                table: guest.table,
+                table: table.id, // Changed from guest.table to table.id
                 tableObject: table,
                 seat: guest.seat,
                 vietnamese_name: guest.vietnamese_name,
@@ -291,7 +291,7 @@ function initializeUI() {
     } else {
         console.error('Cannot initialize venue map: ',
             window.venueLayout ? 'venueLayout exists' : 'venueLayout missing',
-            typeof window.initializeVenueMap === 'function' ? 'function exists' : 'function missing');
+            typeof window.initializeVenueMap === 'function' ? 'function missing');
     }
 
     // Apply translations if the function exists
@@ -386,3 +386,4 @@ Kakashi Hatake,1,Freesia,9,,bride`;
 
 // Make initializeFromCSV available globally
 window.initializeFromCSV = initializeFromCSV;
+
