@@ -386,4 +386,3 @@ Kakashi Hatake,1,Freesia,9,,bride`;
 
 // Make initializeFromCSV available globally
 window.initializeFromCSV = initializeFromCSV;
-
