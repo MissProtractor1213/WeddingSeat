@@ -300,6 +300,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return exactMatch;
         }
 
+        if (exactMatch) {
+            console.log("Found exact match:", exactMatch.name);
+            return exactMatch;
+        }
+
         // Then try partial matches
         const partialMatch = window.guestList.find(guest => {
             // Converting to lowercase and trimming
@@ -451,7 +456,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.warn("Table object or guests not available for this guest");
                 const li = document.createElement('li');
                 li.textContent = window.currentLanguage === 'en' ? 'Table information not available' : 'Thông tin bàn không có sẵn';
-                tablematesListElement.appendChild(li);
+                tablematesListElement.appendChildli);
             }
         }
     }
