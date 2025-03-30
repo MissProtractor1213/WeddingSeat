@@ -29,7 +29,7 @@ function parseCSV(csvContent) {
 
 // Function to process the CSV data and generate the venue layout and guest list
 function processGuestData(csvContent) {
-    console.log("Processing guest data...");
+    console.log("processGuestData called");
 
     // Parse the CSV content
     const rawGuests = parseCSV(csvContent);
@@ -320,14 +320,17 @@ function initializeUI() {
 // This function loads the CSV file and initializes the data
 async function initializeFromCSV() {
     try {
-        console.log("Initializing from CSV...");
+        console.log("initializeFromCSV called");
 
         // CHANGE 1: Hardcode the guest data for testing if fetch fails
         let csvContent;
 
         try {
             // Try to fetch the CSV file
+            console.log("Attempting to fetch 'guests.csv'");
             const response = await fetch('guests.csv');
+            console.log("Fetch response:", response); // Log the entire response object
+
             if (!response.ok) {
                 throw new Error(`Failed to fetch guests.csv: ${response.status} ${response.statusText}`);
             }
@@ -343,11 +346,10 @@ Elan Reckelbus,1,Freesia,2,,bride
 Lucy Tran,1,Freesia,3,,bride
 Edwin Chen,1,Freesia,4,,bride
 Mackenzie Cruz,1,Freesia,5,,bride
-Teagan Stump,1,Freesia,6,,bride
-Lorna Agyare,1,Freesia,7,,bride
-Garrison Burgan,1,Freesia,8,,bride
-Yvonne Nguyen,1,Freesia,9,,bride
-MyViet Nguyen,1,Freesia,10,,bride`;
+Lorna Agyare,1,Freesia,6,,bride
+Garrison Burgan,1,Freesia,7,,bride
+Yvonne Nguyen,1,Freesia,8,,bride
+MyViet Nguyen,1,Freesia,9,,bride`;
 
             console.log("Using hardcoded CSV data as fallback");
         }
