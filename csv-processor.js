@@ -341,15 +341,15 @@ async function initializeFromCSV() {
 
             // Use the sample data from guests.csv
             csvContent = `name,table_id,table_name,seat,vietnamese_name,side
-Tina Reckelbus,1,Freesia,1,,bride
-Elan Reckelbus,1,Freesia,2,,bride
-Lucy Tran,1,Freesia,3,,bride
-Edwin Chen,1,Freesia,4,,bride
-Mackenzie Cruz,1,Freesia,5,,bride
-Lorna Agyare,1,Freesia,6,,bride
-Garrison Burgan,1,Freesia,7,,bride
-Yvonne Nguyen,1,Freesia,8,,bride
-MyViet Nguyen,1,Freesia,9,,bride`;
+Luffy Monkey,1,Freesia,1,,bride
+Naruto Uzumaki,1,Freesia,2,,bride
+Sakura Kinomoto,1,Freesia,3,,bride
+Sasuke Uchiha,4,,bride
+Hinata Hyuuga,1,Freesia,5,,bride
+Tony Chopper,1,Freesia,6,,bride
+Roronoa Zoro,1,Freesia,7,,bride
+Nico Robin,1,Freesia,8,,bride
+Kakashi Hatake,1,Freesia,9,,bride`;
 
             console.log("Using hardcoded CSV data as fallback");
         }
