@@ -456,7 +456,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.warn("Table object or guests not available for this guest");
                 const li = document.createElement('li');
                 li.textContent = window.currentLanguage === 'en' ? 'Table information not available' : 'Thông tin bàn không có sẵn';
-                tablematesListElement.appendChildli);
+                tablematesListElement.appendChild(li);
             }
         }
     }
