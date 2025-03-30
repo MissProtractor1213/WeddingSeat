@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (bestGuestScore > bestScore) {
                 bestScore = bestGuestScore;
                 bestMatch = guest;
-            }
+}
         });
 
         console.log(`Best match: ${bestMatch ? bestMatch.name : 'none'} with score ${bestScore.toFixed(2)}`);
