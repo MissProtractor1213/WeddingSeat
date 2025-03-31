@@ -107,13 +107,13 @@ function processGuestData(csvContent) {
             },
             // Cake area on the right side
             {
-                type: 'circle',
-                name: 'cake',
+                type: 'rectangle',
+                name: 'cakeGifts',
                 x: 875,
-                y: 760,
+                y: 430,
                 width: 70,
-                height: 70,
-                label: 'Cake'
+                height: 100,
+                label: 'Cake & Gifts'
             },
             // Bar area on the left side
             {
@@ -123,17 +123,7 @@ function processGuestData(csvContent) {
                 y: 660,
                 width: 60,
                 height: 200,
-                label: 'Bar'
-            },
-            // Gifts area on the right side
-            {
-                type: 'rectangle',
-                name: 'gifts',
-                x: 875,
-                y: 430,
-                width: 70,
-                height: 100,
-                label: 'Gifts'
+                label: 'BAR'
             },
             // VIP Table in the center-right area
             {
@@ -230,7 +220,7 @@ function arrangeTablesInCustomLayout(tables) {
         42: { x: 264, y: 1130 },
         43: { x: 794, y: 1130 },
         44: { x: 158, y: 1206 },
-        45: { x: 688, y: 1206 },
+        45: { x: 688, y: 1206 }
     };
 
     // Apply positions to tables
@@ -291,7 +281,7 @@ function initializeUI() {
     } else {
         console.error('Cannot initialize venue map: ',
             window.venueLayout ? 'venueLayout exists' : 'venueLayout missing',
-            typeof window.initializeVenueMap === 'function' ? 'function missing');
+            typeof window.initializeVenueMap === 'function' ? 'initializeVenueMap exists' : 'function missing');
     }
 
     // Apply translations if the function exists
