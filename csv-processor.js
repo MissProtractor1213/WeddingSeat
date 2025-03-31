@@ -344,7 +344,7 @@ async function initializeFromCSV() {
 Luffy Monkey,1,Freesia,1,,bride
 Naruto Uzumaki,1,Freesia,2,,bride
 Sakura Kinomoto,1,Freesia,3,,bride
-Sasuke Uchiha,4,,bride
+Sasuke Uchiha,1,Freesia,4,,bride
 Hinata Hyuuga,1,Freesia,5,,bride
 Tony Chopper,1,Freesia,6,,bride
 Roronoa Zoro,1,Freesia,7,,bride
