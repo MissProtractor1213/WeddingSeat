@@ -219,7 +219,7 @@ function searchGuest(name) {
             guestNameElement.textContent = name;
         }
         
-        // Set table name - for demo, we'll use Table 35
+       /* // Set table name - for demo, we'll use Table 35
         const tableNameElement = document.getElementById('tableName');
         if (tableNameElement) {
             tableNameElement.textContent = 'Table 35';
@@ -236,7 +236,7 @@ function searchGuest(name) {
             noResultContainer.classList.add('hidden');
         }
     }
-}
+}*/
 
 // Function to highlight a table
 function highlightTable(tableId) {
