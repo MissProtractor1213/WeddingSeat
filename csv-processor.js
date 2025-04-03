@@ -45,11 +45,11 @@ function processGuestData(csvContent) {
         if (!tablesMap[tableId]) {
             tablesMap[tableId] = {
                 id: tableId,
-                name: tableName,
+                name: tableId === 46 ? "VIP Table" : tableName, // Ensure VIP table is properly named
                 // Positions will be set in the custom layout function
                 x: 0,
                 y: 0,
-                size: 60, // Slightly smaller to fit more tables
+                size: tableId === 46 ? 84 : 70, // Larger for VIP table
                 guests: []
             };
         }
@@ -124,17 +124,8 @@ function processGuestData(csvContent) {
                 width: 60,
                 height: 200,
                 label: 'BAR'
-            },
-            // VIP Table in the center-right area
-            {
-                type: 'rectangle',
-                name: 'vipTable',
-                x: 535,
-                y: 430,
-                width: 120,
-                height: 70,
-                label: 'VIP Table'
             }
+            // VIP Table is now handled as a regular table, not a fixed element
         ],
         tables: tables
     };
@@ -146,7 +137,7 @@ function processGuestData(csvContent) {
         table.guests.forEach(guest => {
             guestList.push({
                 name: guest.name,
-                table: table.id, // Changed from guest.table to table.id
+                table: table.id,
                 tableObject: table,
                 seat: guest.seat,
                 vietnamese_name: guest.vietnamese_name,
@@ -201,10 +192,11 @@ function arrangeTablesInCustomLayout(tables) {
         27: { x: 688, y: 354 },
         28: { x: 794, y: 354 },
 
-        // Row 5 (tables 29-33)
+        // Row 5 (tables 29-33 and VIP table 46)
         29: { x: 158, y: 430 },
         30: { x: 264, y: 430 },
         31: { x: 370, y: 430 },
+        46: { x: 500, y: 430 }, // VIP Table in the center
         32: { x: 688, y: 430 },
         33: { x: 794, y: 430 },
 
@@ -229,12 +221,14 @@ function arrangeTablesInCustomLayout(tables) {
         if (position) {
             table.x = position.x;
             table.y = position.y;
+            console.log(`Table ${table.id} positioned at (${position.x}, ${position.y})`);
         } else {
             // For any tables not in our defined positions (extras beyond 45),
             // place them along the bottom
             const extraIndex = table.id - 45;
             table.x = 400 + (extraIndex * 80);
             table.y = 1250;
+            console.log(`Table ${table.id} (not in position map) placed at (${table.x}, ${table.y})`);
         }
     });
 }
@@ -312,14 +306,12 @@ async function initializeFromCSV() {
     try {
         console.log("initializeFromCSV called");
 
-        // CHANGE 1: Hardcode the guest data for testing if fetch fails
+        // Try to fetch the CSV file
         let csvContent;
-
         try {
-            // Try to fetch the CSV file
             console.log("Attempting to fetch 'guests.csv'");
             const response = await fetch('guests.csv');
-            console.log("Fetch response:", response); // Log the entire response object
+            console.log("Fetch response:", response);
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch guests.csv: ${response.status} ${response.statusText}`);
@@ -327,21 +319,31 @@ async function initializeFromCSV() {
             csvContent = await response.text();
             console.log(`CSV loaded from file, length: ${csvContent.length} characters`);
         } catch (fetchError) {
-            console.warn("Failed to fetch CSV file, using hardcoded data:", fetchError);
-
-            // Use the sample data from guests.csv
-            csvContent = `name,table_id,table_name,seat,vietnamese_name,side
-Luffy Monkey,1,Freesia,1,,bride
-Naruto Uzumaki,1,Freesia,2,,bride
-Sakura Kinomoto,1,Freesia,3,,bride
-Sasuke Uchiha,1,Freesia,4,,bride
-Hinata Hyuuga,1,Freesia,5,,bride
-Tony Chopper,1,Freesia,6,,bride
-Roronoa Zoro,1,Freesia,7,,bride
-Nico Robin,1,Freesia,8,,bride
-Kakashi Hatake,1,Freesia,9,,bride`;
-
-            console.log("Using hardcoded CSV data as fallback");
+            console.warn("Failed to fetch CSV file, using window.fs API:", fetchError);
+            
+            try {
+                // Try the window.fs API as a fallback
+                const fileContent = await window.fs.readFile('guests.csv', { encoding: 'utf8' });
+                csvContent = fileContent;
+                console.log(`CSV loaded with window.fs API, length: ${csvContent.length} characters`);
+            } catch (fsError) {
+                console.warn("Failed to load with window.fs API, using hardcoded data:", fsError);
+                
+                // Use sample data that includes VIP table guests
+                csvContent = `name,table_id,table_name,seat,vietnamese_name,side
+Luffy Monkey,1,One,1,,bride
+Naruto Uzumaki,1,One,2,,bride
+Groom Parent 1,46,VIP,1,,groom
+Groom Parent 2,46,VIP,2,,groom
+Bride Parent 1,46,VIP,3,,bride
+Bride Parent 2,46,VIP,4,,bride
+Tina Reckelbus,35,Thirty-five,1,,bride
+Elan Reckelbus,35,Thirty-five,2,,bride
+Lucy Tran,35,Thirty-five,3,,bride
+Edwin Chen,35,Thirty-five,4,,bride`;
+                
+                console.log("Using hardcoded CSV data as fallback");
+            }
         }
 
         // Validate CSV format
@@ -361,8 +363,16 @@ Kakashi Hatake,1,Freesia,9,,bride`;
         // Initialize the UI now that we have the data
         initializeUI();
 
-        // CHANGE 2: Log the loaded guest data to verify it's working
+        // Log the loaded guest data to verify it's working
         console.log("First few guests loaded:", window.guestList.slice(0, 3));
+        
+        // Log all table IDs to verify the VIP table is included
+        const tableIds = data.venueLayout.tables.map(table => table.id).sort((a, b) => a - b);
+        console.log("All table IDs in the venue layout:", tableIds);
+        
+        // Check if any guests are associated with table 46 (VIP)
+        const vipGuests = window.guestList.filter(g => g.table === 46);
+        console.log(`Found ${vipGuests.length} guests at VIP table (46):`, vipGuests);
 
         // Return success
         return true;
