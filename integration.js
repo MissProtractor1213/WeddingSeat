@@ -16,18 +16,8 @@ document.addEventListener('DOMContentLoaded', function() {
     window.loadSampleGuestData = function() {
         console.log("Loading sample guest data as fallback");
         
-        // Sample data for testing - includes guests at various tables including VIP Table 46
+        // Sample data for testing - includes guests at various tables, not just Table 35
         const sampleGuests = [
-            // VIP Table 46 guests
-            {name: "Groom Parent 1", table: 46, tableObject: {id: 46, name: "VIP Table"}, side: "groom"},
-            {name: "Groom Parent 2", table: 46, tableObject: {id: 46, name: "VIP Table"}, side: "groom"},
-            {name: "Bride Parent 1", table: 46, tableObject: {id: 46, name: "VIP Table"}, side: "bride"},
-            {name: "Bride Parent 2", table: 46, tableObject: {id: 46, name: "VIP Table"}, side: "bride"},
-            {name: "Best Man", table: 46, tableObject: {id: 46, name: "VIP Table"}, side: "groom"},
-            {name: "Maid of Honor", table: 46, tableObject: {id: 46, name: "VIP Table"}, side: "bride"},
-            {name: "Family VIP 1", table: 46, tableObject: {id: 46, name: "VIP Table"}, side: "bride"},
-            {name: "Family VIP 2", table: 46, tableObject: {id: 46, name: "VIP Table"}, side: "groom"},
-            
             // Table 35 guests from example
             {name: "Tina Reckelbus", table: 35, tableObject: {id: 35, name: "Table 35"}, side: "bride"},
             {name: "Elan Reckelbus", table: 35, tableObject: {id: 35, name: "Table 35"}, side: "bride"},
@@ -60,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Store data globally
         window.guestList = sampleGuests;
         
-        console.log("Sample data loaded with", sampleGuests.length, "guests at various tables including VIP Table");
+        console.log("Sample data loaded with", sampleGuests.length, "guests at various tables");
         return true;
     };
     
@@ -95,18 +85,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (resultContainer) {
             const tableNameElement = document.getElementById('tableName');
             if (tableNameElement) {
-                tableNameElement.textContent = tableNumber === 46 ? "VIP Table" : `Table ${tableNumber}`;
+                tableNameElement.textContent = `Table ${tableNumber}`;
             }
             
             // Create a sample guest name
             const guestNameElement = document.getElementById('guestName');
             if (guestNameElement) {
-                guestNameElement.textContent = `Test Guest at ${tableNumber === 46 ? "VIP Table" : "Table " + tableNumber}`;
+                guestNameElement.textContent = `Test Guest at Table ${tableNumber}`;
             }
             
             // Show the container
             resultContainer.classList.remove('hidden');
-            console.log(`Displayed test result for ${tableNumber === 46 ? "VIP Table" : "Table " + tableNumber}`);
+            console.log(`Displayed test result for Table ${tableNumber}`);
         }
     };
     
@@ -120,12 +110,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const tableIds = Array.from(tables).map(table => table.id);
         console.log('Table element IDs:', tableIds);
         
-        // Check if there are any missing tables, including VIP table 46
+        // Check if there are any missing tables
         const missingTables = [];
-        for (let i = 1; i <= 46; i++) {
-            // Skip any gap in the sequence (if tables 34-45 skip some numbers)
-            if (i > 33 && i < 46 && i % 2 === 0) continue;
-            
+        for (let i = 1; i <= 45; i++) {
             if (!document.getElementById(`table-${i}`)) {
                 missingTables.push(i);
             }
@@ -134,14 +121,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (missingTables.length > 0) {
             console.warn(`Missing table elements for tables: ${missingTables.join(', ')}`);
         } else {
-            console.log('All tables (1-46) are present in the DOM');
+            console.log('All tables (1-45) are present in the DOM');
         }
         
-        // Test highlighting various tables including VIP table
+        // Test highlighting a few tables to ensure it works
         setTimeout(() => window.testHighlightTable(1), 1000);
         setTimeout(() => window.testHighlightTable(20), 2000);
         setTimeout(() => window.testHighlightTable(35), 3000);
-        setTimeout(() => window.testHighlightTable(46), 4000); // Test VIP table highlighting
         
         return {
             totalTables: tables.length,
@@ -168,11 +154,11 @@ document.addEventListener('DOMContentLoaded', function() {
         title.style.fontSize = '12px';
         testContainer.appendChild(title);
         
-        // Create buttons to test different tables
-        const tables = [1, 20, 35, 46]; // Added VIP table
+        // Create three buttons to test different tables
+        const tables = [1, 20, 35];
         tables.forEach(tableNum => {
             const button = document.createElement('button');
-            button.textContent = tableNum === 46 ? "VIP Table" : `Table ${tableNum}`;
+            button.textContent = `Table ${tableNum}`;
             button.style.fontSize = '12px';
             button.style.padding = '5px';
             button.style.margin = '2px';
