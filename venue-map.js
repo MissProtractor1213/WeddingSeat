@@ -260,15 +260,6 @@ function createWeddingTables() {
         size: tableSize
     });
     
-    // Add VIP Table (46) in the center
-    tables.push({
-        id: 46,
-        name: `VIP Table`,
-        x: 500,
-        y: 445,
-        size: tableSize * 1.2 // Slightly larger for VIP table
-    });
-    
     tables.push({
         id: 32,
         name: `Table 32`,
