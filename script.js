@@ -333,48 +333,54 @@ document.addEventListener('DOMContentLoaded', function() {
         return findClosestMatch(searchName, side);
     }
 
-    // Function to find the closest matching guest using fuzzy matching
-    function findClosestMatch(searchName, side) {
-        if (!window.guestList || !Array.isArray(window.guestList)) {
-            return null;
+    // Function to find the closest matching guest using improved fuzzy matching
+function findClosestMatch(searchName, side) {
+    if (!window.guestList || !Array.isArray(window.guestList)) {
+        return null;
+    }
+
+    // Filter guests by side - normalize to lowercase for consistent comparison
+    const sideGuests = window.guestList.filter(guest =>
+        (guest.side || "").toLowerCase() === side.toLowerCase()
+    );
+
+    // No guests on this side
+    if (sideGuests.length === 0) {
+        console.log(`No guests found on ${side} side`);
+        return null;
+    }
+
+    let bestMatch = null;
+    let bestScore = 0;
+
+    // Calculate similarity score for each guest
+    sideGuests.forEach(guest => {
+        // Check similarity with English name
+        const nameScore = improvedCalculateSimilarity(searchName, (guest.name || ""));
+
+        // Check similarity with Vietnamese name if available
+        let vnNameScore = 0;
+        if (guest.vietnamese_name) {
+            vnNameScore = improvedCalculateSimilarity(searchName, guest.vietnamese_name);
         }
 
-        // Filter guests by side - normalize to lowercase for consistent comparison
-        const sideGuests = window.guestList.filter(guest =>
-            (guest.side || "").toLowerCase() === side.toLowerCase()
-        );
+        // Use the better score between English and Vietnamese names
+        const bestGuestScore = Math.max(nameScore, vnNameScore);
 
-        // No guests on this side
-        if (sideGuests.length === 0) {
-            console.log(`No guests found on ${side} side`);
-            return null;
+        console.log(`Guest "${guest.name}" similarity score: ${bestGuestScore.toFixed(2)}`);
+
+        // Update the best match if this score is better
+        if (bestGuestScore > bestScore) {
+            bestScore = bestGuestScore;
+            bestMatch = guest;
         }
+    });
 
-        let bestMatch = null;
-        let bestScore = 0;
+    console.log(`Best match: ${bestMatch ? bestMatch.name : 'none'} with score ${bestScore.toFixed(2)}`);
 
-        // Calculate similarity score for each guest
-        sideGuests.forEach(guest => {
-            // Check similarity with English name
-            const nameScore = calculateSimilarity(searchName, (guest.name || "").toLowerCase());
-
-            // Check similarity with Vietnamese name if available
-            let vnNameScore = 0;
-            if (guest.vietnamese_name) {
-                vnNameScore = calculateSimilarity(searchName, guest.vietnamese_name.toLowerCase());
-            }
-
-            // Use the better score between English and Vietnamese names
-            const bestGuestScore = Math.max(nameScore, vnNameScore);
-
-            console.log(`Guest "${guest.name}" similarity score: ${bestGuestScore.toFixed(2)}`);
-
-            // Update the best match if this score is better
-            if (bestGuestScore > bestScore) {
-                bestScore = bestGuestScore;
-                bestMatch = guest;
+    // Only return a match if the similarity is above a threshold (0.4 or 40% similar)
+    return bestScore > 0.4 ? bestMatch : null;
 }
-        });
 
         console.log(`Best match: ${bestMatch ? bestMatch.name : 'none'} with score ${bestScore.toFixed(2)}`);
 
@@ -382,21 +388,85 @@ document.addEventListener('DOMContentLoaded', function() {
         return bestScore > 0.4 ? bestMatch : null;
     }
 
-    // Function to calculate similarity between two strings
-    function calculateSimilarity(str1, str2) {
-        // Simple similarity algorithm (can be improved)
-        const longer = str1.length > str2.length ? str1 : str2;
-        const shorter = str1.length > str2.length ? str2 : str1;
-
-        let hits = 0;
-        for (let i = 0; i < shorter.length; i++) {
-            if (longer.indexOf(shorter[i]) !== -1) {
-                hits++;
-            }
-        }
-
-        return hits / longer.length;
+    // Better similarity calculation that considers name parts separately
+function improvedCalculateSimilarity(searchName, guestName) {
+    // Convert to lowercase
+    const search = searchName.toLowerCase();
+    const guest = guestName.toLowerCase();
+    
+    // Split into words (first name, last name, etc.)
+    const searchParts = search.split(/\s+/);
+    const guestParts = guest.split(/\s+/);
+    
+    // If the number of parts differs significantly, reduce the score
+    const partsDifference = Math.abs(searchParts.length - guestParts.length);
+    if (partsDifference > 1) {
+        return 0.3; // Low base score if structure is very different
     }
+    
+    // Compare each part of the name to find the best matches
+    let totalScore = 0;
+    let matchedParts = 0;
+    
+    // Try to match each search part with the best corresponding guest part
+    for (const searchPart of searchParts) {
+        let bestPartScore = 0;
+        
+        for (const guestPart of guestParts) {
+            // Use Levenshtein distance for each part comparison
+            const distance = levenshteinDistance(searchPart, guestPart);
+            const maxLength = Math.max(searchPart.length, guestPart.length);
+            const partScore = 1 - (distance / maxLength); // Convert to similarity (0-1)
+            
+            // Keep track of the best score for this search part
+            bestPartScore = Math.max(bestPartScore, partScore);
+        }
+        
+        // If this part matched well (>60% similar), count it as matched
+        if (bestPartScore > 0.6) {
+            matchedParts++;
+        }
+        
+        totalScore += bestPartScore;
+    }
+    
+    // Calculate the average score across all parts
+    const averageScore = totalScore / searchParts.length;
+    
+    // Boost score if most parts matched well
+    if (matchedParts >= Math.min(searchParts.length, guestParts.length) - 1) {
+        return Math.min(averageScore * 1.2, 1.0); // Cap at 1.0
+    }
+    
+    return averageScore;
+}
+
+// Levenshtein distance calculation for string comparison
+function levenshteinDistance(str1, str2) {
+    const m = str1.length;
+    const n = str2.length;
+    
+    // Create a matrix of size (m+1) x (n+1)
+    const dp = Array(m + 1).fill().map(() => Array(n + 1).fill(0));
+    
+    // Initialize the first row and column
+    for (let i = 0; i <= m; i++) dp[i][0] = i;
+    for (let j = 0; j <= n; j++) dp[0][j] = j;
+    
+    // Fill the matrix
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+            dp[i][j] = Math.min(
+                dp[i - 1][j] + 1,       // deletion
+                dp[i][j - 1] + 1,       // insertion
+                dp[i - 1][j - 1] + cost // substitution
+            );
+        }
+    }
+    
+    return dp[m][n];
+}
 
     // Function to display guest information
     function displayGuestInfo(guest) {
