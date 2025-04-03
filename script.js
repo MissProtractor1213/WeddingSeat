@@ -300,11 +300,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return exactMatch;
         }
 
-        if (exactMatch) {
-            console.log("Found exact match:", exactMatch.name);
-            return exactMatch;
-        }
-
         // Then try partial matches
         const partialMatch = window.guestList.find(guest => {
             // Converting to lowercase and trimming
@@ -373,7 +368,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (bestGuestScore > bestScore) {
                 bestScore = bestGuestScore;
                 bestMatch = guest;
-}
+            }
         });
 
         console.log(`Best match: ${bestMatch ? bestMatch.name : 'none'} with score ${bestScore.toFixed(2)}`);
@@ -415,11 +410,20 @@ document.addEventListener('DOMContentLoaded', function() {
             guestNameElement.textContent = guest.name;
         }
 
-        // Set table name
-        if (guest.tableObject && tableNameElement) {
-            tableNameElement.textContent = guest.tableObject.name;
-        } else if (tableNameElement) {
-            tableNameElement.textContent = `Table ${guest.table}`;
+        // Set table name - Handle VIP table specially
+        if (tableNameElement) {
+            // Special case for VIP table
+            if (guest.table === 46) {
+                tableNameElement.textContent = "VIP Table";
+            } 
+            // If we have a table object with a name
+            else if (guest.tableObject && guest.tableObject.name) {
+                tableNameElement.textContent = guest.tableObject.name;
+            } 
+            // Fallback to just the table number
+            else {
+                tableNameElement.textContent = `Table ${guest.table}`;
+            }
         }
 
         // Set seat number
@@ -454,9 +458,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } else {
                 console.warn("Table object or guests not available for this guest");
-                const li = document.createElement('li');
-                li.textContent = window.currentLanguage === 'en' ? 'Table information not available' : 'Thông tin bàn không có sẵn';
-                tablematesListElement.appendChild(li);
+                
+                // Try to find tablemates from the guest list
+                const tablemates = window.guestList.filter(g => 
+                    g.table === guest.table && g.name !== guest.name
+                );
+                
+                if (tablemates && tablemates.length > 0) {
+                    tablemates.forEach(tablemate => {
+                        const li = document.createElement('li');
+                        li.textContent = tablemate.name;
+                        tablematesListElement.appendChild(li);
+                    });
+                } else {
+                    const li = document.createElement('li');
+                    li.textContent = window.currentLanguage === 'en' ? 'Table information not available' : 'Thông tin bàn không có sẵn';
+                    tablematesListElement.appendChild(li);
+                }
             }
         }
     }
@@ -485,11 +503,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to get the correct seat number text based on the language
     function getSeatNumberText(seatNumber, lang) {
         if (lang === 'vi') {
-            return `Ghế số ${seatNumber}`;
+            return `Số ghế của bạn là: ${seatNumber}`;
         } else {
-            return `Seat number ${seatNumber}`;
+            return `Your seat number is: ${seatNumber}`;
         }
     }
+
+    // Make the highlightTable function globally available
+    window.highlightTable = highlightTable;
 
     // Initialize the application by loading data and setting up the UI
     if (typeof window.initializeFromCSV === 'function') {
