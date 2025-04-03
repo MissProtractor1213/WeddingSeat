@@ -15,16 +15,6 @@ window.initializeVenueMap = function() {
             width: 1000,
             height: 1200,
             fixedElements: [
-                // VIP Table in the center of row 5
-                {
-                    type: 'rectangle',
-                    name: 'vipTable',
-                    x: 500,
-                    y: 445,
-                    width: 180,
-                    height: 80,
-                    label: 'VIP Table'
-                },
                 // Gifts area on the right side
                 {
                     type: 'rectangle',
@@ -123,9 +113,6 @@ window.initializeVenueMap = function() {
                 elementDiv.style.backgroundColor = '#e6ffe6';
                 elementDiv.style.border = '2px solid #66cc66';
                 elementDiv.style.fontWeight = 'bold';
-            } else if (element.name === 'vipTable') {
-                elementDiv.style.backgroundColor = '#fff0f0';
-                elementDiv.style.border = '2px solid #cc6666';
             } else if (element.name === 'brideGroom') {
                 elementDiv.style.backgroundColor = '#fff0f5';
                 elementDiv.style.border = '2px solid #ff69b4';
@@ -164,6 +151,14 @@ window.initializeVenueMap = function() {
             tableDiv.style.top = `${table.y * scaleY - (table.size * scaleY / 2)}px`;
             tableDiv.style.width = `${table.size * scaleX}px`;
             tableDiv.style.height = `${table.size * scaleY}px`;
+            
+            // VIP table special styling
+            if (table.id === 46) {
+                tableDiv.style.backgroundColor = '#fff0f0';
+                tableDiv.style.border = '2px solid #cc6666';
+                tableDiv.style.fontWeight = 'bold';
+                tableDiv.title = 'VIP Table';
+            }
             
             // Display table number
             tableDiv.textContent = `${table.id}`;
@@ -265,7 +260,14 @@ function createWeddingTables() {
         size: tableSize
     });
     
-    // Skip the VIP Table space
+    // Add VIP Table (46) in the center
+    tables.push({
+        id: 46,
+        name: `VIP Table`,
+        x: 500,
+        y: 445,
+        size: tableSize * 1.2 // Slightly larger for VIP table
+    });
     
     tables.push({
         id: 32,
