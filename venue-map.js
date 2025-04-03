@@ -152,14 +152,6 @@ window.initializeVenueMap = function() {
             tableDiv.style.width = `${table.size * scaleX}px`;
             tableDiv.style.height = `${table.size * scaleY}px`;
             
-            // VIP table special styling
-            if (table.id === 46) {
-                tableDiv.style.backgroundColor = '#fff0f0';
-                tableDiv.style.border = '2px solid #cc6666';
-                tableDiv.style.fontWeight = 'bold';
-                tableDiv.title = 'VIP Table';
-            }
-            
             // Display table number
             tableDiv.textContent = `${table.id}`;
             
