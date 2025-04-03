@@ -201,7 +201,7 @@ function initializeApplication() {
     console.log('Application initialization complete');
 }
 
-// Function to search for a guest
+/*// Function to search for a guest
 function searchGuest(name) {
     console.log('Searching for guest:', name);
     
@@ -219,7 +219,7 @@ function searchGuest(name) {
             guestNameElement.textContent = name;
         }
         
-       /* // Set table name - for demo, we'll use Table 35
+        // Set table name - for demo, we'll use Table 35
         const tableNameElement = document.getElementById('tableName');
         if (tableNameElement) {
             tableNameElement.textContent = 'Table 35';
