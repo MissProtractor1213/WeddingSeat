@@ -64,6 +64,17 @@ window.initializeVenueMap = function() {
                     width: 280,
                     height: 80,
                     label: 'Stage'
+                },
+                // VIP Table in the center
+                {
+                    type: 'rectangle',
+                    name: 'vipTable',
+                    id: 46,
+                    x: 535,
+                    y: 430,
+                    width: 120,
+                    height: 70,
+                    label: 'VIP Table'
                 }
             ],
             tables: createWeddingTables()
@@ -119,6 +130,24 @@ window.initializeVenueMap = function() {
             } else if (element.name === 'cakeGifts') {
                 elementDiv.style.backgroundColor = '#fffacd';
                 elementDiv.style.border = '2px solid #daa520';
+            } else if (element.name === 'vipTable') {
+                // Special VIP table styling
+                elementDiv.style.backgroundColor = '#faebd7';
+                elementDiv.style.border = '2px solid #d4af37';
+                elementDiv.style.fontWeight = 'bold';
+                elementDiv.style.color = '#8b4513';
+                
+                // Make VIP table clickable
+                elementDiv.style.cursor = 'pointer';
+                elementDiv.dataset.tableId = element.id || 46; // Store the table ID
+                
+                // Add click handler for VIP table
+                elementDiv.addEventListener('click', function() {
+                    console.log('VIP Table clicked');
+                    if (typeof window.highlightTable === 'function') {
+                        window.highlightTable(46); // 46 is the VIP table ID
+                    }
+                });
             }
             
             // Set the label based on language
