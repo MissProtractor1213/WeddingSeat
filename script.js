@@ -149,7 +149,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Make the applyTranslations function globally available
     window.applyTranslations = applyTranslations;
 
-    // FIXED: Enhanced search guest function
     // FIXED: Find guest function
     function findGuest(searchName, side) {
         // Make sure guestList exists
@@ -277,250 +276,167 @@ document.addEventListener('DOMContentLoaded', function() {
         return hits / longer.length;
     }
 
-    // Enhanced displayGuestInfo function that properly handles VIP table guests
-function displayGuestInfo(guest) {
-    if (!guest) {
-        console.error("displayGuestInfo called with null guest");
-        return;
-    }
-
-    console.log("Displaying guest info:", guest);
-
-    // Show the result container
-    resultContainer.classList.remove('hidden');
-
-    // Set guest name
-    if (guestNameElement) {
-        guestNameElement.textContent = guest.name;
-    }
-
-    // Check if this is a VIP table guest
-    const isVipGuest = guest.table === 46 || (guest.tableObject && guest.tableObject.id === 46);
-
-    // Set table name based on whether it's a VIP table
-    if (tableNameElement) {
-        if (isVipGuest) {
-            // Get the correct translation for VIP Table
-            const vipTableText = window.currentLanguage === 'vi' ? 'Bàn VIP' : 'VIP Table';
-            tableNameElement.textContent = vipTableText;
-        } else if (guest.tableObject && guest.tableObject.name) {
-            tableNameElement.textContent = guest.tableObject.name;
-        } else {
-            tableNameElement.textContent = `Table ${guest.table}`;
-        }
-    }
-
-    // Set seat number
-    if (seatNumberElement) {
-        seatNumberElement.textContent = guest.seat ? getSeatNumberText(guest.seat, window.currentLanguage) : '';
-    }
-
-    // Highlight the table
-    if (guest.table) {
-        highlightTable(guest.table);
-    }
-
-    // Display tablemates
-    if (tablematesListElement) {
-        tablematesListElement.innerHTML = ''; // Clear previous list
-
-        // Find tablemates based on guest's table
-        let tablemates = [];
+    // Function to highlight a table, including VIP table (ID 46)
+    function highlightTable(tableId) {
+        console.log('Highlighting table:', tableId);
         
-        if (isVipGuest) {
-            // For VIP guests, find other VIP guests
-            tablemates = window.guestList.filter(g => 
-                (g.table === 46 || (g.tableObject && g.tableObject.id === 46)) && 
-                g.name !== guest.name
-            );
-        } else if (guest.tableObject && guest.tableObject.guests) {
-            // Use the tableObject's guest list if available
-            tablemates = guest.tableObject.guests.filter(g => g.name !== guest.name);
-        } else if (guest.table) {
-            // Otherwise find guests at the same table number
-            tablemates = window.guestList.filter(g => 
-                g.table === guest.table && 
-                g.name !== guest.name
-            );
-        }
+        // Remove highlight from all tables and fixed elements
+        document.querySelectorAll('.table, .fixed-element').forEach(element => {
+            element.classList.remove('highlighted');
+        });
         
-        console.log("Tablemates:", tablemates);
-
-        if (tablemates.length > 0) {
-            tablemates.forEach(tablemate => {
-                const li = document.createElement('li');
-                li.textContent = tablemate.name;
-                tablematesListElement.appendChild(li);
-            });
-        } else {
-            const li = document.createElement('li');
-            li.textContent = window.currentLanguage === 'en' ? 'No other guests at this table' : 'Không có khách nào khác ở bàn này';
-            tablematesListElement.appendChild(li);
-        }
-    }
-}
-
-// Enhanced function to highlight a table, including VIP table (ID 46)
-function highlightTable(tableId) {
-    console.log('Highlighting table:', tableId);
-    
-    // Remove highlight from all tables and fixed elements
-    document.querySelectorAll('.table, .fixed-element').forEach(element => {
-        element.classList.remove('highlighted');
-    });
-    
-    // Convert tableId to a number if it's a string
-    const tableIdNum = parseInt(tableId);
-    
-    // Check if this is the VIP table (table 46)
-    if (tableIdNum === 46) {
-        // Multiple approaches to find the VIP table element
-        let vipElementFound = false;
+        // Convert tableId to a number if it's a string
+        const tableIdNum = parseInt(tableId);
         
-        // Approach 1: Find by ID containing "vipTable"
-        const vipElements = document.querySelectorAll('[id*="vipTable"]');
-        if (vipElements.length > 0) {
-            vipElements.forEach(element => {
-                element.classList.add('highlighted');
-                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                vipElementFound = true;
-            });
-        }
-        
-        // Approach 2: Find by data attribute
-        if (!vipElementFound) {
-            const dataElements = document.querySelectorAll('[data-table-id="46"]');
-            if (dataElements.length > 0) {
-                dataElements.forEach(element => {
+        // Check if this is the VIP table (table 46)
+        if (tableIdNum === 46) {
+            // Multiple approaches to find the VIP table element
+            let vipElementFound = false;
+            
+            // Approach 1: Find by ID containing "vipTable"
+            const vipElements = document.querySelectorAll('[id*="vipTable"]');
+            if (vipElements.length > 0) {
+                vipElements.forEach(element => {
                     element.classList.add('highlighted');
                     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     vipElementFound = true;
                 });
             }
-        }
-        
-        // Approach 3: Find by class and text content
-        if (!vipElementFound) {
-            const fixedElements = document.querySelectorAll('.fixed-element');
-            for (const element of fixedElements) {
-                if (element.textContent.toLowerCase().includes('vip')) {
-                    element.classList.add('highlighted');
-                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    vipElementFound = true;
-                    break;
+            
+            // Approach 2: Find by data attribute
+            if (!vipElementFound) {
+                const dataElements = document.querySelectorAll('[data-table-id="46"]');
+                if (dataElements.length > 0) {
+                    dataElements.forEach(element => {
+                        element.classList.add('highlighted');
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        vipElementFound = true;
+                    });
                 }
+            }
+            
+            // Approach 3: Find by class and text content
+            if (!vipElementFound) {
+                const fixedElements = document.querySelectorAll('.fixed-element');
+                for (const element of fixedElements) {
+                    if (element.textContent.toLowerCase().includes('vip')) {
+                        element.classList.add('highlighted');
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        vipElementFound = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (!vipElementFound) {
+                console.error('VIP Table element could not be found');
+            }
+        } else {
+            // Regular table highlighting
+            const tableElement = document.getElementById(`table-${tableIdNum}`);
+            if (tableElement) {
+                tableElement.classList.add('highlighted');
+                tableElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                console.error(`Table element with ID table-${tableIdNum} not found`);
             }
         }
         
-        if (!vipElementFound) {
-            console.error('VIP Table element could not be found');
+        return true; // Return success
+    }
+
+    // Function to display guest information
+    function displayGuestInfo(guest) {
+        if (!guest) {
+            console.error("displayGuestInfo called with null guest");
+            return;
         }
-    } else {
-        // Regular table highlighting
-        const tableElement = document.getElementById(`table-${tableIdNum}`);
-        if (tableElement) {
-            tableElement.classList.add('highlighted');
-            tableElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else {
-            console.error(`Table element with ID table-${tableIdNum} not found`);
+
+        console.log("Displaying guest info:", guest);
+
+        // Show the result container
+        resultContainer.classList.remove('hidden');
+
+        // Set guest name
+        if (guestNameElement) {
+            guestNameElement.textContent = guest.name;
         }
-    }
-    
-    return true; // Return success
-}
 
-// Enhanced function to display guest information
-function displayGuestInfo(guest) {
-    if (!guest) {
-        console.error("displayGuestInfo called with null guest");
-        return;
-    }
+        // Check if this is a VIP table guest
+        const isVipGuest = guest.table === 46 || (guest.tableObject && guest.tableObject.id === 46);
 
-    console.log("Displaying guest info:", guest);
-
-    // Show the result container
-    resultContainer.classList.remove('hidden');
-
-    // Set guest name
-    if (guestNameElement) {
-        guestNameElement.textContent = guest.name;
-    }
-
-    // Check if this is a VIP table guest
-    const isVipGuest = guest.table === 46 || (guest.tableObject && guest.tableObject.id === 46);
-
-    // Set table name based on whether it's a VIP table
-    if (tableNameElement) {
-        if (isVipGuest) {
-            // Get the correct translation for VIP Table
-            const vipTableText = window.currentLanguage === 'vi' ? 'Bàn VIP' : 'VIP Table';
-            tableNameElement.textContent = vipTableText;
-        } else if (guest.tableObject && guest.tableObject.name) {
-            tableNameElement.textContent = guest.tableObject.name;
-        } else {
-            tableNameElement.textContent = `Table ${guest.table}`;
+        // Set table name based on whether it's a VIP table
+        if (tableNameElement) {
+            if (isVipGuest) {
+                // Get the correct translation for VIP Table
+                const vipTableText = window.currentLanguage === 'vi' ? 'Bàn VIP' : 'VIP Table';
+                tableNameElement.textContent = vipTableText;
+            } else if (guest.tableObject && guest.tableObject.name) {
+                tableNameElement.textContent = guest.tableObject.name;
+            } else {
+                tableNameElement.textContent = `Table ${guest.table}`;
+            }
         }
-    }
 
-    // Set seat number
-    if (seatNumberElement) {
-        seatNumberElement.textContent = guest.seat ? getSeatNumberText(guest.seat, window.currentLanguage) : '';
-    }
-
-    // Highlight the table
-    highlightTable(guest.table);
-
-    // Display tablemates
-    if (tablematesListElement) {
-        tablematesListElement.innerHTML = ''; // Clear previous list
-
-        // Find tablemates based on guest's table
-        let tablemates = [];
-        
-        if (isVipGuest) {
-            // For VIP guests, find other VIP guests
-            tablemates = window.guestList.filter(g => 
-                (g.table === 46 || (g.tableObject && g.tableObject.id === 46)) && 
-                g.name !== guest.name
-            );
-        } else if (guest.tableObject && guest.tableObject.guests) {
-            // Use the tableObject's guest list if available
-            tablemates = guest.tableObject.guests.filter(g => g.name !== guest.name);
-        } else if (guest.table) {
-            // Otherwise find guests at the same table number
-            tablemates = window.guestList.filter(g => 
-                g.table === guest.table && 
-                g.name !== guest.name
-            );
+        // Set seat number
+        if (seatNumberElement) {
+            seatNumberElement.textContent = guest.seat ? getSeatNumberText(guest.seat, window.currentLanguage) : '';
         }
-        
-        console.log("Tablemates:", tablemates);
 
-        if (tablemates.length > 0) {
-            tablemates.forEach(tablemate => {
+        // Highlight the table
+        highlightTable(guest.table);
+
+        // Display tablemates
+        if (tablematesListElement) {
+            tablematesListElement.innerHTML = ''; // Clear previous list
+
+            // Find tablemates based on guest's table
+            let tablemates = [];
+            
+            if (isVipGuest) {
+                // For VIP guests, find other VIP guests
+                tablemates = window.guestList.filter(g => 
+                    (g.table === 46 || (g.tableObject && g.tableObject.id === 46)) && 
+                    g.name !== guest.name
+                );
+            } else if (guest.tableObject && guest.tableObject.guests) {
+                // Use the tableObject's guest list if available
+                tablemates = guest.tableObject.guests.filter(g => g.name !== guest.name);
+            } else if (guest.table) {
+                // Otherwise find guests at the same table number
+                tablemates = window.guestList.filter(g => 
+                    g.table === guest.table && 
+                    g.name !== guest.name
+                );
+            }
+            
+            console.log("Tablemates:", tablemates);
+
+            if (tablemates.length > 0) {
+                tablemates.forEach(tablemate => {
+                    const li = document.createElement('li');
+                    li.textContent = tablemate.name;
+                    tablematesListElement.appendChild(li);
+                });
+            } else {
                 const li = document.createElement('li');
-                li.textContent = tablemate.name;
+                li.textContent = window.currentLanguage === 'en' ? 'No other guests at this table' : 'Không có khách nào khác ở bàn này';
                 tablematesListElement.appendChild(li);
-            });
-        } else {
-            const li = document.createElement('li');
-            li.textContent = window.currentLanguage === 'en' ? 'No other guests at this table' : 'Không có khách nào khác ở bàn này';
-            tablematesListElement.appendChild(li);
+            }
         }
     }
-}
-
-// Make sure the highlightTable function is globally available
-window.highlightTable = highlightTable;
 
     // Function to get the correct seat number text based on the language
     function getSeatNumberText(seatNumber, lang) {
         if (lang === 'vi') {
-            return `Ghế số ${seatNumber}`;
+            return `Số ghế của bạn là: ${seatNumber}`;
         } else {
             return `Seat number ${seatNumber}`;
         }
     }
+
+    // Make sure the highlightTable function is globally available
+    window.highlightTable = highlightTable;
 
     // Initialize the application by loading data and setting up the UI
     if (typeof window.initializeFromCSV === 'function') {
@@ -644,3 +560,4 @@ window.highlightTable = highlightTable;
             noResultContainer.classList.remove('hidden');
         }
     }
+});
