@@ -139,7 +139,10 @@ window.initializeVenueMap = function() {
                 
                 // Make VIP table clickable
                 elementDiv.style.cursor = 'pointer';
-                elementDiv.dataset.tableId = element.id || 46; // Store the table ID
+                
+                // Add data attributes for easier selection
+                elementDiv.dataset.tableId = element.id || 46; // Store the table ID as data attribute
+                elementDiv.setAttribute('data-is-vip', 'true');
                 
                 // Add click handler for VIP table
                 elementDiv.addEventListener('click', function() {
