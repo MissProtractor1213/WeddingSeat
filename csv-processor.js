@@ -37,10 +37,24 @@ function processGuestData(csvContent) {
 
     // Extract unique tables
     const tablesMap = {};
+    let vipTableGuests = []; // Store VIP table guests separately
 
     rawGuests.forEach(guest => {
         const tableId = parseInt(guest.table_id);
         const tableName = guest.table_name || `Table ${tableId}`;
+
+        // Check if this is the VIP table (Table 46)
+        if (tableId === 46 || tableName.toLowerCase() === 'vip') {
+            // Add to VIP guests list instead of regular tables
+            vipTableGuests.push({
+                name: guest.name,
+                table: 46,
+                seat: guest.seat ? parseInt(guest.seat) : null,
+                vietnamese_name: guest.vietnamese_name || null,
+                side: guest.side || 'bride' // Default to bride's side if not specified
+            });
+            return; // Skip adding to regular tables
+        }
 
         if (!tablesMap[tableId]) {
             tablesMap[tableId] = {
@@ -125,15 +139,17 @@ function processGuestData(csvContent) {
                 height: 200,
                 label: 'BAR'
             },
-            // VIP Table in the center-right area
+            // VIP Table in the center-right area - Modified to include table ID and guests
             {
                 type: 'rectangle',
                 name: 'vipTable',
+                id: 46, // Added table ID to match with guest data
                 x: 535,
                 y: 430,
                 width: 120,
                 height: 70,
-                label: 'VIP Table'
+                label: 'VIP Table',
+                guests: vipTableGuests // Add the VIP guests to this fixed element
             }
         ],
         tables: tables
@@ -142,16 +158,29 @@ function processGuestData(csvContent) {
     // Create the guest list
     const guestList = [];
 
+    // Add guests from regular tables
     tables.forEach(table => {
         table.guests.forEach(guest => {
             guestList.push({
                 name: guest.name,
-                table: table.id, // Changed from guest.table to table.id
+                table: table.id,
                 tableObject: table,
                 seat: guest.seat,
                 vietnamese_name: guest.vietnamese_name,
                 side: guest.side
             });
+        });
+    });
+
+    // Add VIP table guests
+    vipTableGuests.forEach(guest => {
+        guestList.push({
+            name: guest.name,
+            table: 46,
+            tableObject: venueLayout.fixedElements.find(elem => elem.name === 'vipTable'),
+            seat: guest.seat,
+            vietnamese_name: guest.vietnamese_name,
+            side: guest.side
         });
     });
 
